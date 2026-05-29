@@ -1838,11 +1838,40 @@ textarea.form-control {
     margin-bottom: -8px !important;
   }
   
+  /* Mobile Sidebar Drawer Fixes */
+  .mobile-nav .brand-name {
+    font-size: 1.8rem !important;
+  }
+  
+  .mobile-nav .brand-container {
+    gap: 8px !important;
+  }
+  
+  .mobile-nav .brand-container img {
+    width: 80px !important;
+    height: 80px !important;
+    margin: 0 -8px 0 -12px !important;
+  }
+  
   h1 { font-size: 2.25rem; }
   .section-header h2 { font-size: 1.75rem; }
   
+  /* Carousel Mobile Flow Fixes */
+  .hero-carousel {
+    height: auto !important;
+    min-height: 540px !important;
+  }
+  
+  .carousel-slide {
+    position: relative !important;
+    height: auto !important;
+    min-height: 540px !important;
+    padding: 100px 0 !important;
+    background-attachment: scroll !important; /* Fixes zoomed/blurry background rendering bug on mobile browsers */
+  }
+  
   .slide-content .hero-title {
-    font-size: 2.25rem;
+    font-size: 2.15rem !important;
   }
   
   .carousel-arrow {
@@ -1904,9 +1933,19 @@ textarea.form-control {
 
 @media (max-width: 480px) {
   h1 { font-size: 1.85rem; }
-  .slide-content .hero-title {
-    font-size: 1.75rem;
+  
+  .hero-carousel, .carousel-slide {
+    min-height: 480px !important;
   }
+  
+  .carousel-slide {
+    padding: 70px 0 !important;
+  }
+  
+  .slide-content .hero-title {
+    font-size: 1.75rem !important;
+  }
+  
   .about-company-right {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -1943,6 +1982,13 @@ textarea.form-control {
     font-size: 1.55rem !important;
   }
   .brand-container img {
+    width: 65px !important;
+    height: 65px !important;
+  }
+  .mobile-nav .brand-name {
+    font-size: 1.45rem !important;
+  }
+  .mobile-nav .brand-container img {
     width: 65px !important;
     height: 65px !important;
   }
