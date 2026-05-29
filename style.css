@@ -1817,6 +1817,27 @@ textarea.form-control {
     display: block;
   }
   
+  /* Brand Navigation Responsiveness */
+  .brand-name {
+    font-size: 1.85rem !important;
+  }
+  
+  .brand-container img {
+    width: 80px !important;
+    height: 80px !important;
+    margin-top: -10px !important;
+    margin-bottom: -10px !important;
+    margin-right: -12px !important;
+    margin-left: -12px !important;
+  }
+  
+  .navbar.scrolled .brand-container img {
+    width: 70px !important;
+    height: 70px !important;
+    margin-top: -8px !important;
+    margin-bottom: -8px !important;
+  }
+  
   h1 { font-size: 2.25rem; }
   .section-header h2 { font-size: 1.75rem; }
   
@@ -1833,12 +1854,51 @@ textarea.form-control {
     padding-bottom: 60px;
   }
   
+  /* Layout Grids Stacking */
+  .about-grid-wrapper {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  
+  .booking-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  
+  .why-choose-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .process-timeline {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+  
+  .process-timeline::after {
+    display: none !important; /* Hide horizontal timeline line on tablet/mobile */
+  }
+  
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 30px !important;
+  }
+  
   .form-grid {
     grid-template-columns: 1fr;
   }
   
   .form-group.full-width {
     grid-column: span 1;
+  }
+  
+  .glass-about-card {
+    padding: 32px !important;
   }
 }
 
@@ -1849,18 +1909,21 @@ textarea.form-control {
   }
   .about-company-right {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
   .glass-about-card {
-    padding: 24px;
+    padding: 24px !important;
   }
   .why-choose-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
   .process-timeline {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
   }
   .footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
   .floating-widgets {
     bottom: 20px;
@@ -1872,6 +1935,16 @@ textarea.form-control {
   }
   .form-card {
     padding: 24px;
+  }
+  .stat-card {
+    padding: 24px 16px !important;
+  }
+  .brand-name {
+    font-size: 1.55rem !important;
+  }
+  .brand-container img {
+    width: 65px !important;
+    height: 65px !important;
   }
 }
 
