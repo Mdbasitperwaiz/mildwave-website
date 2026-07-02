@@ -2370,6 +2370,27 @@ section.faded-out {
   .amc-plan-card {
     padding: 30px 20px;
   }
+  
+  /* Manpower Mobile Spacing Overrides */
+  .manpower-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .manpower-tabs-container {
+    justify-content: flex-start !important;
+    padding: 0 16px !important;
+  }
+  .manpower-tab {
+    padding: 10px 16px !important;
+    font-size: 0.875rem !important;
+  }
+  .manpower-card {
+    padding: 24px 20px !important;
+  }
+  .manpower-price {
+    font-size: 1.65rem !important;
+    margin-bottom: 8px !important;
+  }
 }
 
 /* Accessibility Focus Rings */
@@ -2418,6 +2439,12 @@ main {
   gap: 4px;
   overflow-x: auto;
   max-width: 100%;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.manpower-tabs::-webkit-scrollbar {
+  display: none; /* Hide Chrome/Safari scrollbar */
 }
 
 .manpower-tab {
