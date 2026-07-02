@@ -1342,3 +1342,54 @@ window.selectAMCPlan = function(planName) {
   showToastNotification(`Selected ${planName}! Fill out the form to proceed.`);
 };
 
+// 22. Manpower Tab Switching Engine
+window.switchManpowerTab = function(category) {
+  // Remove active state from all tabs
+  const tabs = document.querySelectorAll('.manpower-tab');
+  tabs.forEach(tab => {
+    tab.classList.remove('active');
+    tab.setAttribute('aria-selected', 'false');
+  });
+
+  // Remove active state from all panels
+  const panels = document.querySelectorAll('.manpower-panel');
+  panels.forEach(panel => {
+    panel.classList.remove('active');
+  });
+
+  // Add active state to target tab
+  const targetTab = document.getElementById(`tab-${category}`);
+  if (targetTab) {
+    targetTab.classList.add('active');
+    targetTab.setAttribute('aria-selected', 'true');
+  }
+
+  // Add active state to target panel
+  const targetPanel = document.getElementById(`panel-${category}`);
+  if (targetPanel) {
+    targetPanel.classList.add('active');
+  }
+};
+
+// 23. Manpower Staff Form Hook Selection
+window.selectManpowerStaff = function(role, rate) {
+  // Open the corporate quote request modal
+  if (typeof toggleQuoteModal === 'function') {
+    toggleQuoteModal(true);
+  }
+  
+  // Pre-populate fields in the quote modal
+  const serviceSelect = document.getElementById('modal-service');
+  const descTextarea = document.getElementById('modal-message');
+  
+  if (serviceSelect) {
+    serviceSelect.value = 'Housekeeping Manpower';
+  }
+  
+  if (descTextarea) {
+    descTextarea.value = `Interested in hiring: ${role} (Indicative Rate: ₹${rate.toLocaleString()}/month).`;
+  }
+  
+  showToastNotification(`Selected ${role}! Fill out the corporate quote request.`);
+};
+

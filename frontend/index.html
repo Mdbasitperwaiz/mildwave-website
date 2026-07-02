@@ -111,6 +111,7 @@
             <li><a href="#home" class="active">Home</a></li>
             <li><a href="#services">Services</a></li>
             <li><a href="#ro-amc-plans">AMC Plans</a></li>
+            <li><a href="#manpower-charges">Manpower Rates</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#about">About Us</a></li>
             <li><a href="#documents">Documents</a></li>
@@ -146,6 +147,7 @@
       <li><a href="#home" onclick="closeMobileMenu()">Home</a></li>
       <li><a href="#services" onclick="closeMobileMenu()">Services</a></li>
       <li><a href="#ro-amc-plans" onclick="closeMobileMenu()">AMC Plans</a></li>
+      <li><a href="#manpower-charges" onclick="closeMobileMenu()">Manpower Rates</a></li>
       <li><a href="#projects" onclick="closeMobileMenu()">Projects</a></li>
       <li><a href="#about" onclick="closeMobileMenu()">About Us</a></li>
       <li><a href="#documents" onclick="closeMobileMenu()">Documents</a></li>
@@ -320,8 +322,9 @@
             </div>
             <h3>Housekeeping &amp; Manpower</h3>
             <p>Professional facility management, housekeeping services, customized staffing solutions, temporary and permanent manpower deployment for offices, industrial hubs, and commercial complexes.</p>
-            <div class="service-card-action">
-              <a href="#careers" class="btn btn-outline btn-sm">Join Our Team</a>
+            <div class="service-card-action" style="display: flex; gap: 10px;">
+              <a href="#manpower-charges" class="btn btn-accent btn-sm">View Rates</a>
+              <a href="#careers" class="btn btn-outline btn-sm">Join Team</a>
             </div>
           </article>
 
@@ -687,6 +690,144 @@
         
         <div class="amc-plans-footnote reveal" style="text-align: center; color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">
           <p>*Parts Extra if Required</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANPOWER CHARGES SECTION -->
+    <section class="section-padding bg-white" id="manpower-charges">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Monthly Manpower Charges</h2>
+          <p>Indicative monthly manpower rates for verified, skilled staff deployed across residential complexes, offices, and government sectors.</p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="manpower-tabs-container reveal">
+          <div class="manpower-tabs" role="tablist" aria-label="Manpower Categories">
+            <button class="manpower-tab active" role="tab" aria-selected="true" aria-controls="panel-housekeeping" id="tab-housekeeping" onclick="switchManpowerTab('housekeeping')">
+              <i data-lucide="brush"></i> Housekeeping &amp; Care
+            </button>
+            <button class="manpower-tab" role="tab" aria-selected="false" aria-controls="panel-security" id="tab-security" onclick="switchManpowerTab('security')">
+              <i data-lucide="shield-check"></i> Security Services
+            </button>
+            <button class="manpower-tab" role="tab" aria-selected="false" aria-controls="panel-technical" id="tab-technical" onclick="switchManpowerTab('technical')">
+              <i data-lucide="wrench"></i> Technical &amp; MEP
+            </button>
+            <button class="manpower-tab" role="tab" aria-selected="false" aria-controls="panel-management" id="tab-management" onclick="switchManpowerTab('management')">
+              <i data-lucide="user-cog"></i> Management &amp; Admin
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Content Panels -->
+        <div class="manpower-panels reveal">
+          <!-- Housekeeping Tab Panel -->
+          <div class="manpower-panel active" id="panel-housekeeping" role="tabpanel" aria-labelledby="tab-housekeeping">
+            <div class="manpower-grid">
+              <div class="manpower-card glass-card">
+                <h4>Sweeper</h4>
+                <div class="manpower-price">₹15,500<span>/ month</span></div>
+                <p>Ensures cleanliness of streets, common corridors, and garbage collection routes.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Sweeper', 15500)">Hire Sweeper</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Cleaner / Housekeeping Staff</h4>
+                <div class="manpower-price">₹16,000<span>/ month</span></div>
+                <p>General cleaning, dusting, and mopping services for societies and office blocks.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Cleaner / Housekeeping Staff', 16000)">Hire Cleaner</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Gardener (Mali)</h4>
+                <div class="manpower-price">₹16,500<span>/ month</span></div>
+                <p>Nurtures green lawns, performs seasonal planting, and cuts perimeter shrubs.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Gardener (Mali)', 16500)">Hire Gardener</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Gate Keeper</h4>
+                <div class="manpower-price">₹17,500<span>/ month</span></div>
+                <p>Maintains guest sign-ins and handles gate access control coordinates.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Gate Keeper', 17500)">Hire Gate Keeper</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Tab Panel -->
+          <div class="manpower-panel" id="panel-security" role="tabpanel" aria-labelledby="tab-security">
+            <div class="manpower-grid">
+              <div class="manpower-card glass-card">
+                <h4>Security Guard</h4>
+                <div class="manpower-price">₹18,500<span>/ month</span></div>
+                <p>Patrols property boundaries, monitors CCTV grids, and manages general security.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Security Guard', 18500)">Hire Security Guard</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Security Supervisor</h4>
+                <div class="manpower-price">₹26,000<span>/ month</span></div>
+                <p>Supervises on-duty guards, sets duty shifts, and manages incident reports.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Security Supervisor', 26000)">Hire Supervisor</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technical Tab Panel -->
+          <div class="manpower-panel" id="panel-technical" role="tabpanel" aria-labelledby="tab-technical">
+            <div class="manpower-grid">
+              <div class="manpower-card glass-card">
+                <h4>Electrician</h4>
+                <div class="manpower-price">₹22,000<span>/ month</span></div>
+                <p>Certified repairs of complex electrical connections, panels, wiring, and machinery.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Electrician', 22000)">Hire Electrician</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Plumber</h4>
+                <div class="manpower-price">₹22,000<span>/ month</span></div>
+                <p>Diagnoses and resolves leakage faults, keeps main supply lines online, and repairs fittings.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Plumber', 22000)">Hire Plumber</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Pump Operator</h4>
+                <div class="manpower-price">₹18,500<span>/ month</span></div>
+                <p>Monitors water storage reservoirs and controls pumping machinery cycles.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Pump Operator', 18500)">Hire Pump Operator</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Lift Operator</h4>
+                <div class="manpower-price">₹18,500<span>/ month</span></div>
+                <p>Oversees automatic elevator runs and handles safety procedures during malfunctions.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Lift Operator', 18500)">Hire Lift Operator</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Management Tab Panel -->
+          <div class="manpower-panel" id="panel-management" role="tabpanel" aria-labelledby="tab-management">
+            <div class="manpower-grid">
+              <div class="manpower-card glass-card">
+                <h4>Housekeeping Supervisor</h4>
+                <div class="manpower-price">₹25,000<span>/ month</span></div>
+                <p>Enforces sanitization standards and handles chemical supplies logistics.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Housekeeping Supervisor', 25000)">Hire Supervisor</button>
+              </div>
+              <div class="manpower-card glass-card">
+                <h4>Facility Supervisor</h4>
+                <div class="manpower-price">₹28,000<span>/ month</span></div>
+                <p>Directs maintenance jobs across technical, gardening, and safety workflows.</p>
+                <button class="btn btn-outline btn-sm btn-block" onclick="selectManpowerStaff('Facility Supervisor', 28000)">Hire Supervisor</button>
+              </div>
+              <div class="manpower-card glass-card highlighted-blue">
+                <div class="amc-plan-badge badge-teal">Premium</div>
+                <h4>Facility Manager</h4>
+                <div class="manpower-price">₹40,000+<span>/ month</span></div>
+                <p>Manages overall facility operations, handles vendor compliance, and oversees reporting.</p>
+                <button class="btn btn-primary btn-sm btn-block" onclick="selectManpowerStaff('Facility Manager', 40000)">Hire Manager</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="manpower-footnote reveal">
+          <p><i data-lucide="info"></i> Note: Rates are indicative and may vary depending on duty hours, manpower quantity, site requirements, statutory compliance, and service scope.</p>
         </div>
       </div>
     </section>
