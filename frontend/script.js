@@ -987,21 +987,22 @@ function showToastNotification(message, type = "success") {
 // 17. SPA View Router Controller
 function handleRoute() {
   const hash = window.location.hash || '#home';
-  const sections = document.querySelectorAll('main > section[id]');
+  const sections = document.querySelectorAll('main > section');
   
   sections.forEach(sec => {
-    const id = '#' + sec.getAttribute('id');
+    const id = sec.getAttribute('id');
+    const hashId = id ? '#' + id : null;
     
     if (hash === '#home') {
       // Home routing displays standard scrolling page sections
-      if (id === '#projects' || id === '#documents') {
+      if (id === 'projects' || id === 'documents') {
         sec.classList.add('faded-out');
       } else {
         sec.classList.remove('faded-out');
       }
     } else {
       // Separate Page View routing displays only the requested section
-      if (id === hash) {
+      if (hashId && hashId === hash) {
         sec.classList.remove('faded-out');
       } else {
         sec.classList.add('faded-out');
