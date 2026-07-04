@@ -83,6 +83,8 @@ initializeJsonDb('contacts.json');
 initializeJsonDb('quotes.json');
 initializeJsonDb('newsletter.json');
 initializeJsonDb('candidates.json');
+initializeJsonDb('corporate_applications.json');
+initializeJsonDb('manpower_applications.json');
 
 // Initialize documents.json with default statutory mockups
 const defaultDocuments = [
@@ -176,14 +178,14 @@ const storage = multer.diskStorage({
   }
 });
 
-// File Filter for Career Resumes (PDF, DOC, DOCX)
+// File Filter for Career Resumes and KYC (PDF, DOC, DOCX, JPG, JPEG, PNG)
 const careerFileFilter = (req, file, cb) => {
-  const allowedExtensions = ['.pdf', '.doc', '.docx'];
+  const allowedExtensions = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
   const ext = path.extname(file.originalname).toLowerCase();
   if (allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Only PDF, DOC, and DOCX files are allowed for resumes.'));
+    cb(new Error('Only PDF, DOC, DOCX, JPG, JPEG, and PNG files are allowed for recruitment.'));
   }
 };
 
@@ -202,6 +204,12 @@ const uploadCareer = multer({
   fileFilter: careerFileFilter,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
+
+const uploadCareerFields = uploadCareer.fields([
+  { name: 'resume', maxCount: 1 },
+  { name: 'aadhaar', maxCount: 1 },
+  { name: 'photo', maxCount: 1 }
+]);
 
 const uploadDoc = multer({
   storage: storage,
@@ -381,64 +389,264 @@ app.post('/api/newsletter', (req, res) => {
   }
 });
 
-// 5. POST /api/careers - Career applications with Resume file
-app.post('/api/careers', (req, res) => {
-  uploadCareer.single('resume')(req, res, async (err) => {
+// Helper to escape values for CSV
+function escapeCSV(val) {
+  if (val === null || val === undefined) return '';
+  let str = String(val).replace(/"/g, '""');
+  if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+    str = `"${str}"`;
+  }
+  return str;
+}
+
+// 5a. POST /api/careers/corporate - Corporate applications with Multi-uploads
+app.post('/api/careers/corporate', (req, res) => {
+  uploadCareerFields(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
 
-    const { name, email, phone, position, message } = req.body;
-    const file = req.file;
+    const { 
+      name, fatherName, phone, whatsapp, email, dob, gender, 
+      currentAddress, permanentAddress, qualification, experience, 
+      currentCompany, currentSalary, expectedSalary, preferredLocation, 
+      position, noticePeriod, skills, message 
+    } = req.body;
+
+    // Aadhaar Card is strictly mandatory
+    if (!req.files || !req.files['aadhaar']) {
+      return res.status(400).json({ error: "Aadhaar Card document upload is mandatory." });
+    }
 
     if (!name || name.trim().length < 2) return res.status(400).json({ error: "Invalid name" });
+    if (!phone || phone.trim().length < 10) return res.status(400).json({ error: "Invalid phone number" });
     if (!email || !email.includes('@')) return res.status(400).json({ error: "Invalid email" });
-    if (!phone || phone.trim().length < 10) return res.status(400).json({ error: "Invalid phone" });
     if (!position) return res.status(400).json({ error: "Applying position is required" });
-    if (!file) return res.status(400).json({ error: "Resume attachment is required" });
 
-    const candidates = readDb('candidates.json');
-    const newCandidate = {
-      id: 'candidate_' + Date.now(),
+    const apps = readDb('corporate_applications.json');
+    const resumeFile = req.files['resume'] ? req.files['resume'][0] : null;
+    const aadhaarFile = req.files['aadhaar'][0];
+    const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
+
+    const newApp = {
+      id: 'corp_' + Date.now(),
       name: name.trim(),
-      email: email.trim(),
+      fatherName: (fatherName || '').trim(),
       phone: phone.trim(),
+      whatsapp: (whatsapp || '').trim(),
+      email: email.trim(),
+      dob: (dob || '').trim(),
+      gender: (gender || '').trim(),
+      currentAddress: (currentAddress || '').trim(),
+      permanentAddress: (permanentAddress || '').trim(),
+      qualification: (qualification || '').trim(),
+      experience: (experience || '').trim(),
+      currentCompany: (currentCompany || '').trim(),
+      currentSalary: (currentSalary || '').trim(),
+      expectedSalary: (expectedSalary || '').trim(),
+      preferredLocation: (preferredLocation || '').trim(),
       position,
+      noticePeriod: (noticePeriod || '').trim(),
+      skills: (skills || '').trim(),
       message: (message || '').trim(),
-      resume: {
-        filename: file.filename,
-        originalName: file.originalname,
-        sizeBytes: file.size,
-        path: `/uploads/${file.filename}`
+      files: {
+        resume: resumeFile ? `/uploads/${resumeFile.filename}` : null,
+        aadhaar: `/uploads/${aadhaarFile.filename}`,
+        photo: photoFile ? `/uploads/${photoFile.filename}` : null
       },
       appliedAt: new Date().toISOString()
     };
 
-    candidates.push(newCandidate);
-    if (writeDb('candidates.json', candidates)) {
-      const emailBody = `Full Name: ${newCandidate.name}
-Email: ${newCandidate.email}
-Phone Number: ${newCandidate.phone}
-Applying For: ${newCandidate.position}
-Cover Note: ${newCandidate.message}`;
+    apps.push(newApp);
+    if (writeDb('corporate_applications.json', apps)) {
+      const emailBody = `Corporate Job Application Received
+Full Name: ${newApp.name}
+Position: ${newApp.position}
+Phone: ${newApp.phone}
+Email: ${newApp.email}
+Preferred Location: ${newApp.preferredLocation}
+Expected Salary: ${newApp.expectedSalary}`;
 
-      const attachments = [
-        {
-          filename: file.originalname,
-          path: file.path
-        }
-      ];
+      const attachments = [];
+      if (resumeFile) attachments.push({ filename: resumeFile.originalname, path: resumeFile.path });
+      attachments.push({ filename: aadhaarFile.originalname, path: aadhaarFile.path });
+      if (photoFile) attachments.push({ filename: photoFile.originalname, path: photoFile.path });
 
       try {
-        await sendNotificationEmail("New Job Application Received", emailBody, attachments);
+        await sendNotificationEmail(`New Corporate Application: ${newApp.position}`, emailBody, attachments);
       } catch (mailError) {
-        console.error("[SMTP ERROR]: Failed to send email \"New Job Application Received\":", mailError.message);
+        console.error("[SMTP ERROR]: Failed to send corporate application email:", mailError.message);
       }
-      return res.status(201).json({ success: true, candidate: newCandidate });
+      return res.status(201).json({ success: true, candidate: newApp });
     } else {
       return res.status(500).json({ error: "Internal Database Write Exception" });
     }
   });
+});
+
+// 5b. POST /api/careers/manpower - Manpower applications with Multi-uploads
+app.post('/api/careers/manpower', (req, res) => {
+  uploadCareerFields(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    const { 
+      name, fatherName, phone, whatsapp, aadhaarNumber, dob, gender, 
+      currentAddress, permanentAddress, state, district, pincode, 
+      education, experience, preferredLocation, position, expectedSalary, 
+      readyToRelocate, policeVerification 
+    } = req.body;
+
+    // Aadhaar Card is strictly mandatory
+    if (!req.files || !req.files['aadhaar']) {
+      return res.status(400).json({ error: "Aadhaar Card document upload is mandatory." });
+    }
+
+    if (!name || name.trim().length < 2) return res.status(400).json({ error: "Invalid name" });
+    if (!phone || phone.trim().length < 10) return res.status(400).json({ error: "Invalid phone number" });
+    if (!aadhaarNumber || aadhaarNumber.trim().length !== 12 || isNaN(aadhaarNumber)) {
+      return res.status(400).json({ error: "Aadhaar number must be exactly 12 digits." });
+    }
+    if (!position) return res.status(400).json({ error: "Applying position is required" });
+
+    const apps = readDb('manpower_applications.json');
+    const resumeFile = req.files['resume'] ? req.files['resume'][0] : null;
+    const aadhaarFile = req.files['aadhaar'][0];
+    const photoFile = req.files['photo'] ? req.files['photo'][0] : null;
+
+    const newApp = {
+      id: 'man_' + Date.now(),
+      name: name.trim(),
+      fatherName: (fatherName || '').trim(),
+      phone: phone.trim(),
+      whatsapp: (whatsapp || '').trim(),
+      aadhaarNumber: aadhaarNumber.trim(),
+      dob: (dob || '').trim(),
+      gender: (gender || '').trim(),
+      currentAddress: (currentAddress || '').trim(),
+      permanentAddress: (permanentAddress || '').trim(),
+      state: (state || '').trim(),
+      district: (district || '').trim(),
+      pincode: (pincode || '').trim(),
+      education: (education || '').trim(),
+      experience: (experience || '').trim(),
+      preferredLocation: (preferredLocation || '').trim(),
+      position,
+      expectedSalary: (expectedSalary || '').trim(),
+      readyToRelocate: (readyToRelocate || '').trim(),
+      policeVerification: (policeVerification || '').trim(),
+      files: {
+        resume: resumeFile ? `/uploads/${resumeFile.filename}` : null,
+        aadhaar: `/uploads/${aadhaarFile.filename}`,
+        photo: photoFile ? `/uploads/${photoFile.filename}` : null
+      },
+      appliedAt: new Date().toISOString()
+    };
+
+    apps.push(newApp);
+    if (writeDb('manpower_applications.json', apps)) {
+      const emailBody = `Manpower Job Application Received
+Full Name: ${newApp.name}
+Position: ${newApp.position}
+Phone: ${newApp.phone}
+Aadhaar Number: ${newApp.aadhaarNumber}
+Preferred Location: ${newApp.preferredLocation}
+Expected Salary: ${newApp.expectedSalary}`;
+
+      const attachments = [];
+      if (resumeFile) attachments.push({ filename: resumeFile.originalname, path: resumeFile.path });
+      attachments.push({ filename: aadhaarFile.originalname, path: aadhaarFile.path });
+      if (photoFile) attachments.push({ filename: photoFile.originalname, path: photoFile.path });
+
+      try {
+        await sendNotificationEmail(`New Manpower Application: ${newApp.position}`, emailBody, attachments);
+      } catch (mailError) {
+        console.error("[SMTP ERROR]: Failed to send manpower application email:", mailError.message);
+      }
+      return res.status(201).json({ success: true, candidate: newApp });
+    } else {
+      return res.status(500).json({ error: "Internal Database Write Exception" });
+    }
+  });
+});
+
+// 5c. GET /api/export/corporate - Download Corporate CSV spreadsheet
+app.get('/api/export/corporate', (req, res) => {
+  const apps = readDb('corporate_applications.json');
+  let csv = '\ufeffID,Applied At,Full Name,Father\'s Name,Phone,WhatsApp,Email,Date of Birth,Gender,Current Address,Permanent Address,Highest Qualification,Experience,Current Company,Current Salary,Expected Salary,Preferred Job Location,Position Applying For,Notice Period,Skills,Resume Path,Aadhaar Path,Photo Path,Cover Letter\n';
+  
+  apps.forEach(app => {
+    csv += [
+      app.id,
+      app.appliedAt,
+      app.name,
+      app.fatherName,
+      app.phone,
+      app.whatsapp,
+      app.email,
+      app.dob,
+      app.gender,
+      app.currentAddress,
+      app.permanentAddress,
+      app.qualification,
+      app.experience,
+      app.currentCompany,
+      app.currentSalary,
+      app.expectedSalary,
+      app.preferredLocation,
+      app.position,
+      app.noticePeriod,
+      app.skills,
+      app.files ? app.files.resume : '',
+      app.files ? app.files.aadhaar : '',
+      app.files ? app.files.photo : '',
+      app.message
+    ].map(escapeCSV).join(',') + '\n';
+  });
+  
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename=corporate_applications.csv');
+  res.status(200).send(csv);
+});
+
+// 5d. GET /api/export/manpower - Download Manpower CSV spreadsheet
+app.get('/api/export/manpower', (req, res) => {
+  const apps = readDb('manpower_applications.json');
+  let csv = '\ufeffID,Applied At,Full Name,Father\'s Name,Phone,WhatsApp,Aadhaar Number,Date of Birth,Gender,Current Address,Permanent Address,State,District,PIN Code,Education,Experience,Preferred Job Location,Position Applying For,Expected Salary,Ready to Relocate,Police Verification Available,Resume Path,Aadhaar Path,Photo Path\n';
+  
+  apps.forEach(app => {
+    csv += [
+      app.id,
+      app.appliedAt,
+      app.name,
+      app.fatherName,
+      app.phone,
+      app.whatsapp,
+      app.aadhaarNumber,
+      app.dob,
+      app.gender,
+      app.currentAddress,
+      app.permanentAddress,
+      app.state,
+      app.district,
+      app.pincode,
+      app.education,
+      app.experience,
+      app.preferredLocation,
+      app.position,
+      app.expectedSalary,
+      app.readyToRelocate,
+      app.policeVerification,
+      app.files ? app.files.resume : '',
+      app.files ? app.files.aadhaar : '',
+      app.files ? app.files.photo : ''
+    ].map(escapeCSV).join(',') + '\n';
+  });
+  
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename=manpower_applications.csv');
+  res.status(200).send(csv);
 });
 
 // 6. GET /api/documents - Retrieve all statutory certificates

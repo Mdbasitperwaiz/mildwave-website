@@ -2540,4 +2540,157 @@ main {
   margin-right: 4px;
 }
 
+/* Careers Portal Styling */
+.jobs-grid {
+  margin-top: 20px;
+}
+
+.job-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px;
+  height: 100%;
+  border-radius: var(--radius-md);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.job-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(37, 99, 235, 0.18);
+  box-shadow: var(--shadow-glass), var(--shadow-premium);
+}
+
+.job-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.job-card h3 {
+  font-size: 1.35rem;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.job-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.job-meta-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.job-meta-row i {
+  width: 14px;
+  height: 14px;
+  color: var(--primary);
+}
+
+.job-card p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.job-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.job-category-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+}
+
+.category-corp {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.category-manpower {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* File Upload Progress bars */
+.submit-progress-container {
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid var(--border-light);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+}
+
+/* reCAPTCHA style customizer */
+.recaptcha-widget-placeholder {
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+}
+
+.recaptcha-widget-placeholder:hover {
+  border-color: var(--primary-light);
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Modal Job Details body */
+#modal-job-body h3 {
+  font-size: 1.85rem;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+  font-family: 'Outfit', sans-serif;
+}
+
+#modal-job-body h4 {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+#modal-job-body ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+  list-style-type: disc;
+}
+
+#modal-job-body li {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+/* Form layouts styling fixes for tablet / mobile sizes */
+@media (max-width: 576px) {
+  .job-card {
+    padding: 24px 20px !important;
+  }
+  .job-card-actions {
+    flex-direction: column;
+    gap: 8px !important;
+  }
+  .job-card-actions .btn {
+    width: 100%;
+  }
+}
+
+
 

@@ -245,6 +245,48 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof window.loadLegalDocuments === 'function') {
     window.loadLegalDocuments();
   }
+
+  // Bind Career Portal Drag and Drop zones
+  const careerDropzones = [
+    { zoneId: 'corp-aadhaar-dropzone', inputId: 'corp-file-aadhaar', key: 'corp-aadhaar' },
+    { zoneId: 'corp-resume-dropzone', inputId: 'corp-file-resume', key: 'corp-resume' },
+    { zoneId: 'corp-photo-dropzone', inputId: 'corp-file-photo', key: 'corp-photo' },
+    { zoneId: 'man-aadhaar-dropzone', inputId: 'man-file-aadhaar', key: 'man-aadhaar' },
+    { zoneId: 'man-resume-dropzone', inputId: 'man-file-resume', key: 'man-resume' },
+    { zoneId: 'man-photo-dropzone', inputId: 'man-file-photo', key: 'man-photo' }
+  ];
+
+  careerDropzones.forEach(dz => {
+    const zoneEl = document.getElementById(dz.zoneId);
+    const inputEl = document.getElementById(dz.inputId);
+    if (zoneEl && inputEl) {
+      zoneEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zoneEl.classList.add('selected');
+        zoneEl.style.borderColor = 'var(--primary)';
+      });
+      zoneEl.addEventListener('dragleave', () => {
+        zoneEl.classList.remove('selected');
+        zoneEl.style.borderColor = '#cbd5e1';
+      });
+      zoneEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zoneEl.classList.remove('selected');
+        zoneEl.style.borderColor = '#cbd5e1';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          inputEl.files = files;
+          window.handleRecruitmentFileSelect({ target: inputEl }, dz.key);
+        }
+      });
+    }
+  });
+
+  // Initialize Careers Portal (render corporate tab by default)
+  const corpBtn = document.getElementById('btn-corp-portal');
+  if (corpBtn && typeof window.switchCareerPortal === 'function') {
+    window.switchCareerPortal('corporate');
+  }
 });
 
 // 5. Section Active State Link Highlighting Logic (Scroll-based active states for home)
@@ -498,112 +540,208 @@ if (fileZone) {
   });
 }
 
-function handleFileSelect(event) {
+window.handleRecruitmentFileSelect = function(event, key) {
   const file = event.target.files[0];
-  if (file) {
-    updateFileUploadUI(file);
-  }
-}
-
-function updateFileUploadUI(file) {
-  const fileZone = document.getElementById('file-dropzone');
-  const title = document.getElementById('upload-box-title');
-  const meta = document.getElementById('upload-box-meta');
+  if (!file) return;
+  
+  const zone = document.getElementById(`${key}-dropzone`);
+  const title = document.getElementById(`${key}-title`);
+  const meta = document.getElementById(`${key}-meta`);
   
   const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
   
   if (file.size > 5 * 1024 * 1024) {
     showToastNotification("File size exceeds 5MB limit", "error");
-    document.getElementById('career-resume').value = ""; // Clear file
-    title.textContent = "Click or drag & drop file here";
-    meta.textContent = "PDF or Word format (Max size 5MB)";
-    fileZone.classList.remove('selected');
+    event.target.value = '';
+    if (zone) {
+      zone.classList.remove('selected');
+      zone.style.borderColor = '#ef4444';
+    }
     return;
   }
   
-  title.textContent = file.name;
-  meta.textContent = `File loaded successfully (${sizeMB} MB)`;
-  fileZone.classList.add('selected');
-}
+  if (title && meta && zone) {
+    title.textContent = file.name;
+    meta.textContent = `File ready for upload (${sizeMB} MB)`;
+    zone.classList.add('selected');
+    zone.style.borderColor = 'var(--primary)';
+  }
+};
 
-function handleCareerSubmit(event) {
+window.handleRecruitmentSubmit = function(event, portalType) {
   event.preventDefault();
   
-  const name = document.getElementById('career-name');
-  const email = document.getElementById('career-email');
-  const phone = document.getElementById('career-phone');
-  const position = document.getElementById('career-position');
-  const message = document.getElementById('career-message');
-  const fileInput = document.getElementById('career-resume');
-  const fileZone = document.getElementById('file-dropzone');
+  const prefix = portalType === 'corporate' ? 'corp' : 'man';
+  const form = event.target;
   
+  const inputs = form.querySelectorAll('.form-control[required]');
   let isValid = true;
   
-  if (name.value.trim().length < 2) { highlightError(name, false); isValid = false; } else { highlightError(name, true); }
-  if (!validateEmail(email.value)) { highlightError(email, false); isValid = false; } else { highlightError(email, true); }
-  if (!validatePhone(phone.value)) { highlightError(phone, false); isValid = false; } else { highlightError(phone, true); }
-  if (position.value === '') { highlightError(position, false); isValid = false; } else { highlightError(position, true); }
+  inputs.forEach(input => {
+    if (input.value.trim() === '') {
+      highlightError(input, false);
+      isValid = false;
+    } else {
+      highlightError(input, true);
+    }
+  });
   
-  if (fileInput.files.length === 0) {
-    fileZone.style.borderColor = '#ef4444';
+  const phone = document.getElementById(`${prefix}-phone`);
+  const whatsapp = document.getElementById(`${prefix}-whatsapp`);
+  
+  if (phone && !validatePhone(phone.value)) {
+    highlightError(phone, false);
     isValid = false;
-  } else {
-    fileZone.style.borderColor = '#cbd5e1';
+  }
+  if (whatsapp && !validatePhone(whatsapp.value)) {
+    highlightError(whatsapp, false);
+    isValid = false;
   }
   
-  if (isValid) {
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
-    if (submitBtn) toggleButtonLoading(submitBtn, true);
-
-    const formData = new FormData();
-    formData.append('name', name.value.trim());
-    formData.append('email', email.value.trim());
-    formData.append('phone', phone.value.trim());
-    formData.append('position', position.value);
-    formData.append('message', message ? message.value.trim() : '');
-    formData.append('resume', fileInput.files[0]);
-
-    fetch(`${API_BASE}/api/careers`, {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => {
-      if (!response.ok) throw new Error("Server error");
-      return response.json();
-    })
-    .then(data => {
-      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      document.getElementById('career-form-container').style.display = 'none';
-      document.getElementById('career-success-panel').style.display = 'block';
+  if (portalType === 'corporate') {
+    const email = document.getElementById('corp-email');
+    if (email && !validateEmail(email.value)) {
+      highlightError(email, false);
+      isValid = false;
+    }
+  }
+  
+  if (portalType === 'manpower') {
+    const aadhaarNum = document.getElementById('man-aadhaar-num');
+    if (aadhaarNum) {
+      const val = aadhaarNum.value.trim();
+      if (val.length !== 12 || isNaN(val)) {
+        highlightError(aadhaarNum, false);
+        isValid = false;
+        showToastNotification("Aadhaar number must be exactly 12 digits.", "error");
+      } else {
+        highlightError(aadhaarNum, true);
+      }
+    }
+  }
+  
+  const aadhaarInput = document.getElementById(`${prefix}-file-aadhaar`);
+  const aadhaarZone = document.getElementById(`${prefix}-aadhaar-dropzone`);
+  if (!aadhaarInput || aadhaarInput.files.length === 0) {
+    if (aadhaarZone) aadhaarZone.style.borderColor = '#ef4444';
+    isValid = false;
+    showToastNotification("Aadhaar Card upload is mandatory.", "error");
+  } else {
+    if (aadhaarZone) aadhaarZone.style.borderColor = '#cbd5e1';
+  }
+  
+  const recaptchaCheck = document.getElementById(`${prefix}-recaptcha-check`);
+  if (recaptchaCheck && !recaptchaCheck.checked) {
+    isValid = false;
+    showToastNotification("Please complete the reCAPTCHA verification.", "error");
+  }
+  
+  if (!isValid) {
+    showToastNotification("Please check all required fields.", "error");
+    return;
+  }
+  
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+  if (submitBtn) toggleButtonLoading(submitBtn, true);
+  
+  const progressContainer = document.getElementById(`${prefix}-submit-progress`);
+  const progressPercent = document.getElementById(`${prefix}-progress-percent`);
+  const progressFill = document.getElementById(`${prefix}-progress-fill`);
+  
+  if (progressContainer) progressContainer.style.display = 'block';
+  
+  const formData = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `${API_BASE}/api/careers/${portalType}`, true);
+  
+  xhr.upload.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const progress = Math.round((e.loaded / e.total) * 100);
+      if (progressPercent) progressPercent.textContent = `${progress}%`;
+      if (progressFill) progressFill.style.width = `${progress}%`;
+    }
+  });
+  
+  xhr.addEventListener('load', () => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    
+    if (xhr.status === 200 || xhr.status === 201) {
       showToastNotification("Application submitted successfully!");
-    })
-    .catch(error => {
-      console.error("Submission failed:", error);
-      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      showToastNotification("Something went wrong. Please try again.", "error");
-    });
-  } else {
-    showToastNotification("Please review required profile fields.", "error");
-  }
-}
+      
+      form.style.display = 'none';
+      const successPanel = document.getElementById('recruitment-success-panel');
+      if (successPanel) successPanel.style.display = 'block';
+      
+      const successMsg = document.getElementById('recruitment-success-message');
+      if (successMsg) {
+        successMsg.textContent = "Thank you for applying to Mildwave Marketing Pvt. Ltd. Your application has been received successfully. Our HR team will review your profile and contact you if you are shortlisted.";
+      }
+      
+      setTimeout(() => {
+        if (progressContainer) progressContainer.style.display = 'none';
+        if (progressPercent) progressPercent.textContent = '0%';
+        if (progressFill) progressFill.style.width = '0%';
+      }, 500);
+    } else {
+      let errMsg = "Submission failed. Please try again.";
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (res.error) errMsg = res.error;
+      } catch (ex) {}
+      showToastNotification(errMsg, "error");
+      
+      setTimeout(() => {
+        if (progressContainer) progressContainer.style.display = 'none';
+      }, 500);
+    }
+  });
+  
+  xhr.addEventListener('error', () => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    showToastNotification("Network error occurred. Please try again.", "error");
+    setTimeout(() => {
+      if (progressContainer) progressContainer.style.display = 'none';
+    }, 500);
+  });
+  
+  xhr.send(formData);
+};
 
-function resetCareerForm() {
-  document.getElementById('career-application-form').reset();
-  document.getElementById('career-form-container').style.display = 'block';
-  document.getElementById('career-success-panel').style.display = 'none';
+function resetRecruitmentUploadUI(prefix) {
+  const fields = ['resume', 'aadhaar', 'photo'];
+  fields.forEach(field => {
+    const input = document.getElementById(`${prefix}-file-${field}`);
+    if (input) input.value = '';
+    
+    const zone = document.getElementById(`${prefix}-${field}-dropzone`);
+    if (zone) {
+      zone.classList.remove('selected');
+      zone.style.borderColor = '#cbd5e1';
+    }
+    
+    const title = document.getElementById(`${prefix}-${field}-title`);
+    const meta = document.getElementById(`${prefix}-${field}-meta`);
+    
+    if (title && meta) {
+      if (field === 'resume') {
+        title.textContent = "Click or drag & drop Resume here";
+        meta.textContent = "PDF, DOC, or DOCX format (Max size 5MB)";
+      } else if (field === 'aadhaar') {
+        title.textContent = "Click or drag & drop Aadhaar Card here";
+        meta.textContent = "PDF, JPG, JPEG, or PNG format (Max size 5MB)";
+      } else if (field === 'photo') {
+        title.textContent = "Click or drag & drop Photo here";
+        meta.textContent = "JPG, JPEG, or PNG format (Max size 5MB)";
+      }
+    }
+  });
   
-  // Reset dropzone details
-  const title = document.getElementById('upload-box-title');
-  const meta = document.getElementById('upload-box-meta');
-  const fileZone = document.getElementById('file-dropzone');
-  title.textContent = "Click or drag & drop file here";
-  meta.textContent = "PDF or Word format (Max size 5MB)";
-  fileZone.classList.remove('selected');
-  fileZone.style.borderColor = '#cbd5e1';
-  
-  const inputs = document.querySelectorAll('#career-application-form .form-control');
+  const inputs = document.querySelectorAll(`#${prefix === 'corp' ? 'corporate' : 'manpower'}-recruitment-form .form-control`);
   inputs.forEach(el => highlightError(el, true));
+  
+  const progress = document.getElementById(`${prefix}-submit-progress`);
+  if (progress) progress.style.display = 'none';
 }
 
 // 11. General Contact Form submission validation
@@ -1374,12 +1512,10 @@ window.switchManpowerTab = function(category) {
 
 // 23. Manpower Staff Form Hook Selection
 window.selectManpowerStaff = function(role, rate) {
-  // Open the corporate quote request modal
   if (typeof toggleQuoteModal === 'function') {
     toggleQuoteModal(true);
   }
   
-  // Pre-populate fields in the quote modal
   const serviceSelect = document.getElementById('modal-service');
   const descTextarea = document.getElementById('modal-message');
   
@@ -1392,5 +1528,283 @@ window.selectManpowerStaff = function(role, rate) {
   }
   
   showToastNotification(`Selected ${role}! Fill out the corporate quote request.`);
+};
+
+// 24. Careers Portal Dynamic Job Boards Data and Render Engines
+const CORPORATE_JOBS = [
+  { id: 'c_sales_mgr', title: 'Sales Manager', category: 'Sales', location: 'Patna, Bihar', salary: '₹35,000 - ₹50,000 / month', experience: '3-5 Years', description: 'Lead the sales operations division, manage client accounts, optimize regional channels, and build tactical corporate alliances.' },
+  { id: 'c_sales_exec', title: 'Sales Executive', category: 'Sales', location: 'Kolkata, WB', salary: '₹18,000 - ₹25,000 / month', experience: '1-2 Years', description: 'Drive client onboarding, conduct market sweeps, pitch support solutions, and meet quarterly target expectations.' },
+  { id: 'c_bde', title: 'Business Development Executive', category: 'Sales', location: 'Patna, Bihar', salary: '₹22,000 - ₹30,000 / month', experience: '2+ Years', description: 'Identify corporate RFQ opportunities, bid on government tenders, present sales brochures, and secure vendor slots.' },
+  { id: 'c_telecall', title: 'Telecalling Executive', category: 'Support', location: 'Patna, Bihar', salary: '₹12,000 - ₹18,000 / month', experience: '0-2 Years', description: 'Inbound booking processing, follow up on quotes, maintain call databases, and provide excellent customer interactions.' },
+  { id: 'c_cust_support', title: 'Customer Support Executive', category: 'Support', location: 'Patna, Bihar', salary: '₹15,000 - ₹20,000 / month', experience: '1-3 Years', description: 'Handle AMC client relations, coordinate technician dispatches, escalate tickets, and resolve service queries.' },
+  { id: 'c_data_entry', title: 'Data Entry Operator', category: 'Technical', location: 'Patna, Bihar', salary: '₹12,000 - ₹15,000 / month', experience: '0-1 Years', description: 'Log statutory documents, update candidate database spreadsheets, verify booking details, and run administrative reports.' },
+  { id: 'c_admin', title: 'Office Administrator', category: 'Operations', location: 'Patna, Bihar', salary: '₹20,000 - ₹28,000 / month', experience: '3+ Years', description: 'Oversee corporate plaza logistics, manage pantry inventory, approve schedules, and compile operations reports.' },
+  { id: 'c_receptionist', title: 'Receptionist', category: 'Support', location: 'Patna, Bihar', salary: '₹14,000 - ₹18,000 / month', experience: '1-2 Years', description: 'Greet visitors, handle front-desk calls, route post parcels, coordinate corporate calendars, and manage office flow.' },
+  { id: 'c_dig_mktg', title: 'Digital Marketing Executive', category: 'Remote / Patna', salary: '₹18,000 - ₹26,000 / month', experience: '1-3 Years', description: 'Manage search campaigns, run social media advertisements, design brochures, audit web SEO status, and monitor leads.' },
+  { id: 'c_accounts', title: 'Accounts Executive', category: 'Finance', location: 'Patna, Bihar', salary: '₹18,000 - ₹24,000 / month', experience: '2-4 Years', description: 'File GST compliance claims, process payroll spreadsheets, invoice corporate vendors, and draft audits.' }
+];
+
+const MANPOWER_JOBS = [
+  { id: 'm_hk', title: 'Housekeeping Staff', category: 'Housekeeping', location: 'Patna, Bihar', salary: '₹10,500 - ₹12,500 / month', experience: '0-1 Year', description: 'Keep corporate offices, commercial malls, or residential spaces clean, tidy, and hygienic daily.' },
+  { id: 'm_cleaner', title: 'Cleaner', category: 'Housekeeping', location: 'Patna, Bihar', salary: '₹9,500 - ₹11,500 / month', experience: 'Fresher', description: 'Perform deep-cleaning duties, wash floors, windows, and sanitize restrooms using certified equipment.' },
+  { id: 'm_sweeper', title: 'Sweeper', category: 'Housekeeping', location: 'Patna, Bihar', salary: '₹9,000 - ₹10,500 / month', experience: 'Fresher', description: 'Sweep outdoor pathways, clear trash bins, maintain waste dumps, and clean surrounding areas.' },
+  { id: 'm_guard', title: 'Security Guard', category: 'Security', location: 'PAN India', salary: '₹12,000 - ₹16,000 / month', experience: '1+ Year', description: 'Guard gates, check visitor logs, monitor CCTV security feeds, and protect corporate facilities.' },
+  { id: 'm_gatekeeper', title: 'Gate Keeper', category: 'Security', location: 'Patna, Bihar', salary: '₹11,000 - ₹13,500 / month', experience: '0-1 Year', description: 'Authorize entry of logistics trucks, maintain visitor badges, and inspect incoming assets.' },
+  { id: 'm_gardener', title: 'Gardener', category: 'Facility Maintenance', location: 'Patna, Bihar', salary: '₹10,000 - ₹12,500 / month', experience: '1+ Year', description: 'Maintain lawns, water plants, trim hedges, and apply organic compost to commercial properties.' },
+  { id: 'm_electrician', title: 'Electrician', category: 'Technical', location: 'Patna, Bihar', salary: '₹15,000 - ₹22,000 / month', experience: '2+ Years', description: 'Install power wirings, maintain generator backups, resolve circuit breaker failures, and perform electrical safety audits.' },
+  { id: 'm_plumber', title: 'Plumber', category: 'Technical', location: 'Patna, Bihar', salary: '₹13,500 - ₹18,000 / month', experience: '2+ Years', description: 'Repair pipe leaks, unclog drains, install bathroom fittings, and clear building water supply links.' },
+  { id: 'm_pump_op', title: 'Pump Operator', category: 'Technical', location: 'Patna, Bihar', salary: '₹12,000 - ₹15,000 / month', experience: '1-2 Years', description: 'Monitor water pump operations, verify storage tank levels, clean water filters, and log run logs.' },
+  { id: 'm_lift_op', title: 'Lift Operator', category: 'Technical', location: 'Patna, Bihar', salary: '₹11,000 - ₹14,000 / month', experience: '0-1 Year', description: 'Manage lift controls, guide passengers, coordinate emergency elevator services, and run safety tests.' },
+  { id: 'm_tech', title: 'Maintenance Technician', category: 'Technical', location: 'Patna, Bihar', salary: '₹16,000 - ₹24,000 / month', experience: '3+ Years', description: 'Perform repairs on AC machinery, escalators, plumbing loops, and office equipment.' },
+  { id: 'm_hk_sup', title: 'Housekeeping Supervisor', category: 'Housekeeping', location: 'Patna, Bihar', salary: '₹14,000 - ₹18,000 / month', experience: '3+ Years', description: 'Direct cleanings teams, audit cleaning quality, track inventory, and allocate daily tasks.' },
+  { id: 'm_sec_sup', title: 'Security Supervisor', category: 'Security', location: 'Patna, Bihar', salary: '₹16,500 - ₹22,000 / month', experience: '4+ Years', description: 'Oversee guard shifts, conduct security briefings, coordinate emergencies, and report to management.' },
+  { id: 'm_fac_sup', title: 'Facility Supervisor', category: 'Operations', location: 'Patna, Bihar', salary: '₹18,000 - ₹25,000 / month', experience: '3+ Years', description: 'Coordinate support staff, maintain AMC logs, supervise building maintenance, and manage bills.' },
+  { id: 'm_fac_mgr', title: 'Facility Manager', category: 'Operations', location: 'Patna, Bihar', salary: '₹30,000 - ₹45,000 / month', experience: '5+ Years', description: 'Manage multi-site operations, prepare budgets, oversee vendor services, audits, and SLA reporting.' },
+  { id: 'm_office_boy', title: 'Office Boy', category: 'Support', location: 'Patna, Bihar', salary: '₹10,000 - ₹13,000 / month', experience: 'Fresher / 10th Pass', description: 'Ensure desk cleanings, serve tea/coffee to management and clients, run post/file runs, maintain pantry stock, and assist staff.',
+    details: {
+      responsibilities: [
+        'Maintain daily cleanliness of desks, cabins, meeting rooms, and receptionist lobby.',
+        'Prepare and serve tea, coffee, water, and lunch requests to staff and corporate visitors.',
+        'Coordinate postal runs, file movements between departments, bank deposit slips, and stationery deliveries.',
+        'Track and log pantry inventory, hygiene consumables, and arrange tea/coffee refills.',
+        'Run minor office errands outside (purchases, photo copying, courier dispatch).'
+      ],
+      requirements: [
+        'Minimum education: 10th Standard (Matriculation) pass certificate.',
+        'Basic communication skills in Hindi; understanding of English is a plus.',
+        'Honest, polite, well-mannered, and punctual characteristics.',
+        'Healthy and physically fit for active work shifts.',
+        'Available for full-time corporate hours.'
+      ]
+    }
+  },
+  { id: 'm_peon', title: 'Peon', category: 'Support', location: 'Patna, Bihar', salary: '₹9,500 - ₹11,500 / month', experience: 'Fresher', description: 'Assist in office runs, lock/unlock gates, carry files, copy documents, and maintain log logs.' },
+  { id: 'm_helper', title: 'Helper', category: 'Support', location: 'Patna, Bihar', salary: '₹9,500 - ₹11,000 / month', experience: 'Fresher', description: 'Help load/unload goods, support technicians, clear pathways, and perform general tasks.' },
+  { id: 'm_pantry_boy', title: 'Pantry Boy', category: 'Support', location: 'Patna, Bihar', salary: '₹10,000 - ₹12,500 / month', experience: '0-1 Year', description: 'Operate tea/coffee machines, maintain pantry cleanliness, wash cups, and serve visitors.' },
+  { id: 'm_mts', title: 'Multi Tasking Staff (MTS)', category: 'Support', location: 'Patna, Bihar', salary: '₹11,000 - ₹14,500 / month', experience: '0-2 Years', description: 'Handle photocopy requests, file storage, attend front desk, print documents, and help teams.' }
+];
+
+let activeCareerPortal = 'corporate';
+let activeJobCategory = 'all';
+
+window.switchCareerPortal = function(portalType) {
+  activeCareerPortal = portalType;
+  activeJobCategory = 'all';
+  
+  const btnCorp = document.getElementById('btn-corp-portal');
+  const btnMan = document.getElementById('btn-manpower-portal');
+  
+  if (btnCorp && btnMan) {
+    if (portalType === 'corporate') {
+      btnCorp.classList.add('active');
+      btnCorp.setAttribute('aria-selected', 'true');
+      btnMan.classList.remove('active');
+      btnMan.setAttribute('aria-selected', 'false');
+    } else {
+      btnMan.classList.add('active');
+      btnMan.setAttribute('aria-selected', 'true');
+      btnCorp.classList.remove('active');
+      btnCorp.setAttribute('aria-selected', 'false');
+    }
+  }
+  
+  renderCategoryFilterPills();
+  renderActivePortalJobs();
+  window.showJobBoard();
+};
+
+function renderCategoryFilterPills() {
+  const container = document.getElementById('job-filter-container');
+  if (!container) return;
+  
+  const jobs = activeCareerPortal === 'corporate' ? CORPORATE_JOBS : MANPOWER_JOBS;
+  const categories = ['all', ...new Set(jobs.map(job => job.category))];
+  
+  container.innerHTML = '';
+  
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = `btn btn-outline btn-sm filter-btn ${cat === activeJobCategory ? 'active' : ''}`;
+    btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+    btn.onclick = () => {
+      activeJobCategory = cat;
+      const filterBtns = container.querySelectorAll('.filter-btn');
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderActivePortalJobs();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function renderActivePortalJobs() {
+  const grid = document.getElementById('jobs-listing-grid');
+  if (!grid) return;
+  
+  const jobs = activeCareerPortal === 'corporate' ? CORPORATE_JOBS : MANPOWER_JOBS;
+  const searchInput = document.getElementById('job-search-input');
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  
+  grid.innerHTML = '';
+  
+  const filtered = jobs.filter(job => {
+    const matchesCategory = activeJobCategory === 'all' || job.category === activeJobCategory;
+    const matchesQuery = job.title.toLowerCase().includes(query) || job.description.toLowerCase().includes(query);
+    return matchesCategory && matchesQuery;
+  });
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+      <i data-lucide="info" style="width: 48px; height: 48px; margin: 0 auto 16px; color: var(--primary);"></i>
+      <h4>No active openings match your search.</h4>
+      <p>Try clearing your search query or switching categories.</p>
+    </div>`;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    return;
+  }
+  
+  filtered.forEach(job => {
+    const card = document.createElement('div');
+    card.className = 'job-card glass-card';
+    
+    const catClass = activeCareerPortal === 'corporate' ? 'category-corp' : 'category-manpower';
+    const experienceBadge = job.experience ? `<span><i data-lucide="award"></i> ${job.experience}</span>` : '';
+    
+    const hasDetails = !!job.details;
+    const applyButton = `<button class="btn btn-primary btn-sm" onclick="window.openApplicationForm('${job.id}')">Apply Now</button>`;
+    const detailsButton = hasDetails ? `<button class="btn btn-outline btn-sm" onclick="window.showJobDetails('${job.id}')">View Details</button>` : '';
+    
+    const waShareText = `*Job Opportunity at Mildwave Marketing Pvt. Ltd.*\n\n*Position:* ${job.title}\n*Location:* ${job.location}\n*Salary:* ${job.salary}\n*Experience:* ${job.experience}\n\n*Description:* ${job.description}\n\nApply online at: https://mildwavem.co.in/#careers`;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waShareText)}`;
+    
+    card.innerHTML = `
+      <div>
+        <div class="job-card-header">
+          <span class="job-category-pill ${catClass}">${job.category}</span>
+          <a href="${waUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding: 4px 8px; font-size: 0.75rem;" title="Share on WhatsApp"><i data-lucide="share-2" style="width: 14px; height: 14px; margin-right: 4px; vertical-align: middle;"></i>Share</a>
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">${escapeHTML(job.title)}</h3>
+        <div class="job-meta-row">
+          <span><i data-lucide="map-pin"></i> ${job.location}</span>
+          <span><i data-lucide="indian-rupee"></i> ${job.salary}</span>
+          ${experienceBadge}
+        </div>
+        <p>${escapeHTML(job.description)}</p>
+      </div>
+      <div class="job-card-actions">
+        ${detailsButton}
+        ${applyButton}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+window.filterJobs = function() {
+  renderActivePortalJobs();
+};
+
+window.openApplicationForm = function(jobId) {
+  const job = [...CORPORATE_JOBS, ...MANPOWER_JOBS].find(j => j.id === jobId);
+  if (!job) return;
+  
+  document.getElementById('job-board-view').style.display = 'none';
+  document.getElementById('application-form-view').style.display = 'block';
+  
+  const isCorp = CORPORATE_JOBS.some(j => j.id === jobId);
+  const badge = document.getElementById('form-job-badge');
+  badge.textContent = isCorp ? 'Corporate Division' : 'Manpower Division';
+  badge.className = `job-category-pill ${isCorp ? 'category-corp' : 'category-manpower'}`;
+  
+  document.getElementById('form-job-title').textContent = job.title;
+  document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}`;
+  
+  const corpForm = document.getElementById('corporate-recruitment-form');
+  const manForm = document.getElementById('manpower-recruitment-form');
+  const successPanel = document.getElementById('recruitment-success-panel');
+  
+  corpForm.style.display = 'none';
+  manForm.style.display = 'none';
+  successPanel.style.display = 'none';
+  
+  if (isCorp) {
+    corpForm.style.display = 'block';
+    corpForm.reset();
+    document.getElementById('corp-hidden-position').value = job.title;
+    resetRecruitmentUploadUI('corp');
+  } else {
+    manForm.style.display = 'block';
+    manForm.reset();
+    document.getElementById('man-hidden-position').value = job.title;
+    resetRecruitmentUploadUI('man');
+  }
+  
+  const formHeader = document.getElementById('application-form-view');
+  if (formHeader) formHeader.scrollIntoView({ behavior: 'smooth' });
+  
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+};
+
+window.showJobBoard = function() {
+  document.getElementById('job-board-view').style.display = 'block';
+  document.getElementById('application-form-view').style.display = 'none';
+  
+  const careersSection = document.getElementById('careers');
+  if (careersSection) careersSection.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.showJobDetails = function(jobId) {
+  const job = [...CORPORATE_JOBS, ...MANPOWER_JOBS].find(j => j.id === jobId);
+  if (!job || !job.details) return;
+  
+  const body = document.getElementById('modal-job-body');
+  if (!body) return;
+  
+  const respList = job.details.responsibilities.map(r => `<li>${escapeHTML(r)}</li>`).join('');
+  const reqList = job.details.requirements.map(r => `<li>${escapeHTML(r)}</li>`).join('');
+  
+  body.innerHTML = `
+    <span class="job-category-pill category-manpower" style="margin-bottom: 12px; display: inline-block;">${job.category}</span>
+    <h3 id="modal-job-title-lbl" style="font-size: 1.85rem; color: var(--text-dark); margin-bottom: 8px;">${escapeHTML(job.title)}</h3>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}</p>
+    
+    <div style="border-top: 1px solid var(--border-light); padding-top: 20px;">
+      <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Job Responsibilities:</h4>
+      <ul>${respList}</ul>
+      
+      <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Candidate Requirements:</h4>
+      <ul>${reqList}</ul>
+    </div>
+    
+    <div style="margin-top: 30px; display: flex; gap: 12px;">
+      <button class="btn btn-outline btn-block" onclick="window.toggleJobModal(false)" style="flex: 1; width: 100%;">Close</button>
+      <button class="btn btn-primary btn-block" onclick="window.toggleJobModal(false); window.openApplicationForm('${job.id}');" style="flex: 1; width: 100%;">Apply Online</button>
+    </div>
+  `;
+  
+  window.toggleJobModal(true);
+  
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+};
+
+window.toggleJobModal = function(show) {
+  const modal = document.getElementById('job-details-modal');
+  if (!modal) return;
+  
+  if (show) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } else {
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
 };
 
