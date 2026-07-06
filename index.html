@@ -597,7 +597,7 @@
           <!-- Card 1: Basic Plan -->
           <div class="amc-plan-card glass-card reveal basic-plan">
             <div class="amc-plan-header">
-              <span class="amc-brand-badge brand-kent">Kent</span>
+              <span class="amc-brand-badge brand-nonbranded" style="color: #475569; background: #f1f5f9;">Non-Branded RO Only</span>
               <h3>Basic Plan</h3>
               <div class="amc-plan-price">
                 <span class="currency">₹</span>
@@ -612,38 +612,38 @@
               </ul>
             </div>
             <div class="amc-plan-footer">
-              <button class="btn btn-outline btn-sm btn-block" onclick="selectAMCPlan('Basic Plan (Kent)')">Book Plan</button>
+              <button class="btn btn-outline btn-sm btn-block" onclick="selectAMCPlan('Basic Plan (Non-Branded RO Only)')">Book Plan</button>
             </div>
           </div>
 
-          <!-- Card 2: Offer Plan -->
+          <!-- Card 2: Classic Plan -->
           <div class="amc-plan-card glass-card reveal offer-plan highlighted">
             <div class="amc-plan-badge badge-orange">Best Value</div>
             <div class="amc-plan-header">
-              <span class="amc-brand-badge brand-all">All Brands</span>
-              <h3>Offer Plan</h3>
+              <span class="amc-brand-badge brand-nonbranded" style="color: #475569; background: #f1f5f9;">Non-Branded RO Only</span>
+              <h3>Classic Plan</h3>
               <div class="amc-plan-price">
                 <span class="currency">₹</span>
-                <span class="amount">149</span>
-                <span class="period">/ service visit</span>
+                <span class="amount">1499</span>
+                <span class="period">/ year</span>
               </div>
             </div>
             <div class="amc-plan-body">
               <ul class="amc-features">
-                <li><i data-lucide="check-circle"></i> Complete RO Service &amp; Cleaning</li>
-                <li><i data-lucide="check-circle"></i> Water TDS Level Check-up Free</li>
-                <li><i data-lucide="check-circle"></i> System Diagnostics &amp; Leak Check</li>
+                <li><i data-lucide="check-circle"></i> Free RO Service One Year</li>
+                <li><i data-lucide="check-circle"></i> TDS Check Up Free</li>
+                <li><i data-lucide="check-circle"></i> 3 Free Service Visits</li>
               </ul>
             </div>
             <div class="amc-plan-footer">
-              <button class="btn btn-primary btn-sm btn-block" onclick="selectAMCPlan('Offer Plan (One-Time Service)')">Book Plan</button>
+              <button class="btn btn-primary btn-sm btn-block" onclick="selectAMCPlan('Classic Plan (Non-Branded RO Only)')">Book Plan</button>
             </div>
           </div>
           <!-- Card 3: Green Plan -->
           <div class="amc-plan-card glass-card reveal green-plan">
             <div class="amc-plan-badge badge-green">Smart Choice</div>
             <div class="amc-plan-header">
-              <span class="amc-brand-badge brand-livpure">Livpure</span>
+              <span class="amc-brand-badge brand-nonbranded" style="color: #475569; background: #f1f5f9;">Non-Branded RO Only</span>
               <h3>Green Plan</h3>
               <div class="amc-plan-price">
                 <span class="currency">₹</span>
@@ -659,7 +659,7 @@
               </ul>
             </div>
             <div class="amc-plan-footer">
-              <button class="btn btn-outline btn-sm btn-block" onclick="selectAMCPlan('Green Plan (Livpure)')">Book Plan</button>
+              <button class="btn btn-outline btn-sm btn-block" onclick="selectAMCPlan('Green Plan (Non-Branded RO Only)')">Book Plan</button>
             </div>
           </div>
 
@@ -667,7 +667,7 @@
           <div class="amc-plan-card glass-card reveal green-plus-plan highlighted-blue">
             <div class="amc-plan-badge badge-teal">Premium Care</div>
             <div class="amc-plan-header">
-              <span class="amc-brand-badge brand-pureit">Pureit</span>
+              <span class="amc-brand-badge brand-branded" style="color: #0369a1; background: #e0f2fe;">Major Brands</span>
               <h3>Green Plus Plan</h3>
               <div class="amc-plan-price">
                 <span class="currency">₹</span>
@@ -677,13 +677,14 @@
             </div>
             <div class="amc-plan-body">
               <ul class="amc-features">
+                <li><i data-lucide="check-circle"></i> Supports Kent, Aquaguard, Livpure, Pureit, AO Smith, Havells, etc.</li>
                 <li><i data-lucide="check-circle"></i> Free RO Service One Year</li>
                 <li><i data-lucide="check-circle"></i> Free TDS Check Up</li>
                 <li><i data-lucide="check-circle"></i> All Filter Replaced One Time</li>
               </ul>
             </div>
             <div class="amc-plan-footer">
-              <button class="btn btn-primary btn-sm btn-block" onclick="selectAMCPlan('Green Plus Plan (Pureit)')">Book Plan</button>
+              <button class="btn btn-primary btn-sm btn-block" onclick="selectAMCPlan('Green Plus Plan (Kent, Aquaguard, Livpure, etc.)')">Book Plan</button>
             </div>
           </div>
         </div>
@@ -958,12 +959,13 @@
           
           <!-- Booking Success Panel -->
           <div class="submit-success-panel" id="ro-success-panel">
-            <div class="success-icon-anim">
+            <div class="success-icon-anim" style="background-color: var(--primary-light); color: var(--primary); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.15);">
               <i data-lucide="check"></i>
             </div>
-            <h3>Thank you!</h3>
-            <p>Your request has been submitted successfully.</p>
-            <button class="btn btn-outline btn-sm" style="margin-top: 24px;" onclick="resetROForm()">Book Another Service</button>
+            <h3>WhatsApp Redirected!</h3>
+            <p style="margin-bottom: 8px;">We have redirected you to WhatsApp with your booking details pre-filled.</p>
+            <p style="color: var(--accent); font-weight: 600; font-size: 1rem; margin-bottom: 24px;">Please press the "Send" button in WhatsApp to complete your booking request.</p>
+            <button class="btn btn-outline btn-sm" onclick="resetROForm()">Book Another Service</button>
           </div>
         </div>
       </div>
@@ -1024,7 +1026,6 @@
 
             <!-- FORM 1: CORPORATE RECRUITMENT FORM -->
             <form id="corporate-recruitment-form" onsubmit="handleRecruitmentSubmit(event, 'corporate')" novalidate style="display: none;">
-              <input type="hidden" name="position" id="corp-hidden-position">
               <div class="form-grid">
                 <!-- Personal Info -->
                 <div class="form-group">
@@ -1032,87 +1033,32 @@
                   <input type="text" id="corp-name" name="name" class="form-control" placeholder="Enter first & last name" required>
                 </div>
                 <div class="form-group">
-                  <label for="corp-father-name">Father's Name *</label>
-                  <input type="text" id="corp-father-name" name="fatherName" class="form-control" placeholder="Enter father's name" required>
-                </div>
-
-                <!-- Contact -->
-                <div class="form-group">
                   <label for="corp-phone">Mobile Number *</label>
                   <input type="tel" id="corp-phone" name="phone" class="form-control" placeholder="10-digit number" required>
                 </div>
                 <div class="form-group">
-                  <label for="corp-whatsapp">WhatsApp Number *</label>
-                  <input type="tel" id="corp-whatsapp" name="whatsapp" class="form-control" placeholder="10-digit number" required>
-                </div>
-                <div class="form-group">
                   <label for="corp-email">Email Address *</label>
-                  <input type="email" id="corp-email" name="email" class="form-control" placeholder="name@company.com" required>
-                </div>
-
-                <!-- KYC & Demographics -->
-                <div class="form-group">
-                  <label for="corp-dob">Date of Birth *</label>
-                  <input type="date" id="corp-dob" name="dob" class="form-control" required>
+                  <input type="email" id="corp-email" name="email" class="form-control" placeholder="name@email.com" required>
                 </div>
                 <div class="form-group">
-                  <label for="corp-gender">Gender *</label>
-                  <select id="corp-gender" name="gender" class="form-control" required>
-                    <option value="" disabled selected>Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <!-- Addresses -->
-                <div class="form-group full-width">
-                  <label for="corp-curr-address">Current Address *</label>
-                  <input type="text" id="corp-curr-address" name="currentAddress" class="form-control" placeholder="House No, Street, Landmark, City, Pincode" required>
-                </div>
-                <div class="form-group full-width">
-                  <label for="corp-perm-address">Permanent Address *</label>
-                  <input type="text" id="corp-perm-address" name="permanentAddress" class="form-control" placeholder="House No, Street, Landmark, City, Pincode" required>
+                  <label for="corp-address">Address *</label>
+                  <input type="text" id="corp-address" name="address" class="form-control" placeholder="Enter complete address" required>
                 </div>
 
                 <!-- Career Credentials -->
                 <div class="form-group">
                   <label for="corp-qualification">Highest Qualification *</label>
-                  <input type="text" id="corp-qualification" name="qualification" class="form-control" placeholder="e.g. B.Tech, MBA, Graduate" required>
+                  <input type="text" id="corp-qualification" name="qualification" class="form-control" placeholder="e.g. Graduate, B.Com, MBA" required>
                 </div>
                 <div class="form-group">
                   <label for="corp-experience">Years of Experience *</label>
                   <input type="text" id="corp-experience" name="experience" class="form-control" placeholder="e.g. Fresher, 2 Years" required>
                 </div>
-                <div class="form-group">
-                  <label for="corp-curr-company">Current Company</label>
-                  <input type="text" id="corp-curr-company" name="currentCompany" class="form-control" placeholder="Leave blank if fresher">
-                </div>
-                <div class="form-group">
-                  <label for="corp-curr-salary">Current Monthly Salary (INR)</label>
-                  <input type="text" id="corp-curr-salary" name="currentSalary" class="form-control" placeholder="e.g. 25,000">
-                </div>
-                <div class="form-group">
-                  <label for="corp-exp-salary">Expected Monthly Salary (INR) *</label>
-                  <input type="text" id="corp-exp-salary" name="expectedSalary" class="form-control" placeholder="e.g. 30,000" required>
-                </div>
-                <div class="form-group">
-                  <label for="corp-notice">Notice Period *</label>
-                  <select id="corp-notice" name="noticePeriod" class="form-control" required>
-                    <option value="" disabled selected>Select notice period</option>
-                    <option value="Immediate Joiner">Immediate Joiner</option>
-                    <option value="15 Days">15 Days</option>
-                    <option value="30 Days">30 Days</option>
-                    <option value="60 Days">60 Days</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="corp-location">Preferred Job Location *</label>
-                  <input type="text" id="corp-location" name="preferredLocation" class="form-control" placeholder="e.g. Patna, Kolkata" required>
-                </div>
-                <div class="form-group">
-                  <label for="corp-skills">Key Skills *</label>
-                  <input type="text" id="corp-skills" name="skills" class="form-control" placeholder="e.g. Sales, Telecalling, MS Excel" required>
+
+                <!-- Position Applying For (Pre-filled, visible text field) -->
+                <div class="form-group full-width">
+                  <label for="corp-hidden-position">Position Applying For *</label>
+                  <input type="text" name="position" id="corp-hidden-position" class="form-control" style="background-color: var(--light-bg); cursor: not-allowed;" readonly required>
                 </div>
 
                 <!-- Mandatory Aadhaar Upload -->
@@ -1153,12 +1099,6 @@
                     <input type="file" id="corp-file-photo" name="photo" accept=".jpg,.jpeg,.png" onchange="handleRecruitmentFileSelect(event, 'corp-photo')">
                   </div>
                 </div>
-
-                <!-- Cover Letter -->
-                <div class="form-group full-width">
-                  <label for="corp-message">Cover Letter / Professional Bio (Optional)</label>
-                  <textarea id="corp-message" name="message" class="form-control" style="min-height: 120px;" placeholder="Write a short summary about your professional background and why you want to join us..."></textarea>
-                </div>
               </div>
 
               <!-- Google reCAPTCHA Verification (Client-side Placeholder) -->
@@ -1186,7 +1126,6 @@
 
             <!-- FORM 2: MANPOWER RECRUITMENT FORM -->
             <form id="manpower-recruitment-form" onsubmit="handleRecruitmentSubmit(event, 'manpower')" novalidate style="display: none;">
-              <input type="hidden" name="position" id="man-hidden-position">
               <div class="form-grid">
                 <!-- Personal Info -->
                 <div class="form-group">
@@ -1194,97 +1133,32 @@
                   <input type="text" id="man-name" name="name" class="form-control" placeholder="Enter full name" required>
                 </div>
                 <div class="form-group">
-                  <label for="man-father-name">Father's Name *</label>
-                  <input type="text" id="man-father-name" name="fatherName" class="form-control" placeholder="Enter father's name" required>
-                </div>
-
-                <!-- Contact -->
-                <div class="form-group">
                   <label for="man-phone">Mobile Number *</label>
                   <input type="tel" id="man-phone" name="phone" class="form-control" placeholder="10-digit number" required>
                 </div>
                 <div class="form-group">
-                  <label for="man-whatsapp">WhatsApp Number *</label>
-                  <input type="tel" id="man-whatsapp" name="whatsapp" class="form-control" placeholder="10-digit number" required>
-                </div>
-
-                <!-- Demographics & Aadhaar -->
-                <div class="form-group">
-                  <label for="man-aadhaar-num">Aadhaar Number *</label>
-                  <input type="text" id="man-aadhaar-num" name="aadhaarNumber" class="form-control" placeholder="12-digit Aadhaar Card number" required>
+                  <label for="man-email">Email Address *</label>
+                  <input type="email" id="man-email" name="email" class="form-control" placeholder="name@email.com" required>
                 </div>
                 <div class="form-group">
-                  <label for="man-dob">Date of Birth *</label>
-                  <input type="date" id="man-dob" name="dob" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label for="man-gender">Gender *</label>
-                  <select id="man-gender" name="gender" class="form-control" required>
-                    <option value="" disabled selected>Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <!-- Addresses -->
-                <div class="form-group full-width">
-                  <label for="man-curr-address">Current Address *</label>
-                  <input type="text" id="man-curr-address" name="currentAddress" class="form-control" placeholder="House/Quarters No., Village/Locality, Post, City" required>
-                </div>
-                <div class="form-group full-width">
-                  <label for="man-perm-address">Permanent Address *</label>
-                  <input type="text" id="man-perm-address" name="permanentAddress" class="form-control" placeholder="House/Quarters No., Village/Locality, Post, City" required>
-                </div>
-
-                <!-- Location Details -->
-                <div class="form-group">
-                  <label for="man-state">State *</label>
-                  <input type="text" id="man-state" name="state" class="form-control" placeholder="e.g. Bihar, West Bengal" required>
-                </div>
-                <div class="form-group">
-                  <label for="man-district">District *</label>
-                  <input type="text" id="man-district" name="district" class="form-control" placeholder="e.g. Patna, Kolkata" required>
-                </div>
-                <div class="form-group">
-                  <label for="man-pin">PIN Code *</label>
-                  <input type="text" id="man-pin" name="pincode" class="form-control" placeholder="6-digit PIN" required>
+                  <label for="man-address">Address *</label>
+                  <input type="text" id="man-address" name="address" class="form-control" placeholder="Enter complete address" required>
                 </div>
 
                 <!-- Job Credentials -->
                 <div class="form-group">
-                  <label for="man-education">Highest Education *</label>
-                  <input type="text" id="man-education" name="education" class="form-control" placeholder="e.g. 10th Pass, 12th Pass, Graduate" required>
+                  <label for="man-education">Highest Qualification *</label>
+                  <input type="text" id="man-education" name="qualification" class="form-control" placeholder="e.g. 10th Pass, Graduate, B.A" required>
                 </div>
                 <div class="form-group">
                   <label for="man-experience">Years of Experience *</label>
                   <input type="text" id="man-experience" name="experience" class="form-control" placeholder="e.g. Fresher, 1 Year" required>
                 </div>
-                <div class="form-group">
-                  <label for="man-location">Preferred Work Location *</label>
-                  <input type="text" id="man-location" name="preferredLocation" class="form-control" placeholder="e.g. Patna, Kolkata" required>
-                </div>
-                <div class="form-group">
-                  <label for="man-salary">Expected Monthly Salary (INR) *</label>
-                  <input type="text" id="man-salary" name="expectedSalary" class="form-control" placeholder="e.g. 18,000" required>
-                </div>
 
-                <!-- Recruitment Checkboxes -->
-                <div class="form-group">
-                  <label for="man-relocate">Ready to Relocate *</label>
-                  <select id="man-relocate" name="readyToRelocate" class="form-control" required>
-                    <option value="" disabled selected>Select option</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="man-police">Police Verification Record Available? *</label>
-                  <select id="man-police" name="policeVerification" class="form-control" required>
-                    <option value="" disabled selected>Select option</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
+                <!-- Position Applying For (Pre-filled, visible text field) -->
+                <div class="form-group full-width">
+                  <label for="man-hidden-position">Position Applying For *</label>
+                  <input type="text" name="position" id="man-hidden-position" class="form-control" style="background-color: var(--light-bg); cursor: not-allowed;" readonly required>
                 </div>
 
                 <!-- Mandatory Aadhaar Upload -->
@@ -1315,7 +1189,7 @@
 
                 <!-- Passport Photo Upload -->
                 <div class="form-group full-width">
-                  <label>Passport Size Photo (Image) * <span style="color: var(--text-muted); font-size: 0.8rem;">(Optional)</span></label>
+                  <label>Passport Size Photo (Image) <span style="color: var(--text-muted); font-size: 0.8rem;">(Optional)</span></label>
                   <div class="file-upload-box" id="man-photo-dropzone" style="position: relative;">
                     <i data-lucide="user"></i>
                     <div class="file-upload-info">

@@ -44,6 +44,35 @@ const sendNotificationEmail = async (subject, textBody, attachments = []) => {
   }
 };
 
+// Helper to log booking to Google Sheets via Webhook URL
+const logToGoogleSheets = async (bookingData) => {
+  const sheetWebhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  if (!sheetWebhookUrl) {
+    console.warn("[GOOGLE SHEETS WARNING]: GOOGLE_SHEETS_WEBHOOK_URL is not configured in .env. Skipping Google Sheets logging.");
+    return { skipped: true, reason: "GOOGLE_SHEETS_WEBHOOK_URL not configured" };
+  }
+
+  try {
+    const response = await fetch(sheetWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bookingData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    console.log("[GOOGLE SHEETS SUCCESS]: Booking logged to Google Sheets successfully.");
+    return { success: true };
+  } catch (error) {
+    console.error("[GOOGLE SHEETS ERROR]: Failed to log booking to Google Sheets:", error.message);
+    return { success: false, error: error.message };
+  }
+};
+
 // Enable CORS for frontend queries
 app.use(cors());
 
@@ -276,11 +305,13 @@ Preferred Time: ${newBooking.time}
 Address: ${newBooking.address}
 Issue Details: ${newBooking.message}`;
 
-    try {
-      await sendNotificationEmail("New RO Service Booking Request", emailBody);
-    } catch (mailError) {
-      console.error("[SMTP ERROR]: Failed to send email \"New RO Service Booking Request\":", mailError.message);
-    }
+    // Trigger background tasks asynchronously (non-blocking)
+    sendNotificationEmail("New RO Service Booking Request", emailBody)
+      .catch(mailError => console.error("[SMTP ERROR]: Failed to send email \"New RO Service Booking Request\":", mailError.message));
+    
+    logToGoogleSheets(newBooking)
+      .catch(sheetError => console.error("[GOOGLE SHEETS ERROR]: Failed to log booking in background:", sheetError.message));
+
     return res.status(201).json({ success: true, booking: newBooking });
   } else {
     return res.status(500).json({ error: "Internal Database Write Exception" });
@@ -407,10 +438,7 @@ app.post('/api/careers/corporate', (req, res) => {
     }
 
     const { 
-      name, fatherName, phone, whatsapp, email, dob, gender, 
-      currentAddress, permanentAddress, qualification, experience, 
-      currentCompany, currentSalary, expectedSalary, preferredLocation, 
-      position, noticePeriod, skills, message 
+      name, phone, email, address, qualification, experience, position 
     } = req.body;
 
     // Aadhaar Card is strictly mandatory
@@ -421,6 +449,9 @@ app.post('/api/careers/corporate', (req, res) => {
     if (!name || name.trim().length < 2) return res.status(400).json({ error: "Invalid name" });
     if (!phone || phone.trim().length < 10) return res.status(400).json({ error: "Invalid phone number" });
     if (!email || !email.includes('@')) return res.status(400).json({ error: "Invalid email" });
+    if (!address || address.trim().length < 5) return res.status(400).json({ error: "Invalid address" });
+    if (!qualification || qualification.trim().length < 2) return res.status(400).json({ error: "Invalid qualification" });
+    if (!experience || experience.trim().length < 1) return res.status(400).json({ error: "Invalid experience" });
     if (!position) return res.status(400).json({ error: "Applying position is required" });
 
     const apps = readDb('corporate_applications.json');
@@ -431,24 +462,12 @@ app.post('/api/careers/corporate', (req, res) => {
     const newApp = {
       id: 'corp_' + Date.now(),
       name: name.trim(),
-      fatherName: (fatherName || '').trim(),
       phone: phone.trim(),
-      whatsapp: (whatsapp || '').trim(),
       email: email.trim(),
-      dob: (dob || '').trim(),
-      gender: (gender || '').trim(),
-      currentAddress: (currentAddress || '').trim(),
-      permanentAddress: (permanentAddress || '').trim(),
-      qualification: (qualification || '').trim(),
-      experience: (experience || '').trim(),
-      currentCompany: (currentCompany || '').trim(),
-      currentSalary: (currentSalary || '').trim(),
-      expectedSalary: (expectedSalary || '').trim(),
-      preferredLocation: (preferredLocation || '').trim(),
-      position,
-      noticePeriod: (noticePeriod || '').trim(),
-      skills: (skills || '').trim(),
-      message: (message || '').trim(),
+      address: address.trim(),
+      qualification: qualification.trim(),
+      experience: experience.trim(),
+      position: position.trim(),
       files: {
         resume: resumeFile ? `/uploads/${resumeFile.filename}` : null,
         aadhaar: `/uploads/${aadhaarFile.filename}`,
@@ -459,13 +478,14 @@ app.post('/api/careers/corporate', (req, res) => {
 
     apps.push(newApp);
     if (writeDb('corporate_applications.json', apps)) {
-      const emailBody = `Corporate Job Application Received
+      const emailBody = `Corporate Job Application Received (Simplified)
 Full Name: ${newApp.name}
 Position: ${newApp.position}
 Phone: ${newApp.phone}
 Email: ${newApp.email}
-Preferred Location: ${newApp.preferredLocation}
-Expected Salary: ${newApp.expectedSalary}`;
+Address: ${newApp.address}
+Qualification: ${newApp.qualification}
+Experience: ${newApp.experience}`;
 
       const attachments = [];
       if (resumeFile) attachments.push({ filename: resumeFile.originalname, path: resumeFile.path });
@@ -492,10 +512,7 @@ app.post('/api/careers/manpower', (req, res) => {
     }
 
     const { 
-      name, fatherName, phone, whatsapp, aadhaarNumber, dob, gender, 
-      currentAddress, permanentAddress, state, district, pincode, 
-      education, experience, preferredLocation, position, expectedSalary, 
-      readyToRelocate, policeVerification 
+      name, phone, email, address, qualification, experience, position 
     } = req.body;
 
     // Aadhaar Card is strictly mandatory
@@ -505,9 +522,10 @@ app.post('/api/careers/manpower', (req, res) => {
 
     if (!name || name.trim().length < 2) return res.status(400).json({ error: "Invalid name" });
     if (!phone || phone.trim().length < 10) return res.status(400).json({ error: "Invalid phone number" });
-    if (!aadhaarNumber || aadhaarNumber.trim().length !== 12 || isNaN(aadhaarNumber)) {
-      return res.status(400).json({ error: "Aadhaar number must be exactly 12 digits." });
-    }
+    if (!email || !email.includes('@')) return res.status(400).json({ error: "Invalid email" });
+    if (!address || address.trim().length < 5) return res.status(400).json({ error: "Invalid address" });
+    if (!qualification || qualification.trim().length < 2) return res.status(400).json({ error: "Invalid qualification" });
+    if (!experience || experience.trim().length < 1) return res.status(400).json({ error: "Invalid experience" });
     if (!position) return res.status(400).json({ error: "Applying position is required" });
 
     const apps = readDb('manpower_applications.json');
@@ -518,24 +536,12 @@ app.post('/api/careers/manpower', (req, res) => {
     const newApp = {
       id: 'man_' + Date.now(),
       name: name.trim(),
-      fatherName: (fatherName || '').trim(),
       phone: phone.trim(),
-      whatsapp: (whatsapp || '').trim(),
-      aadhaarNumber: aadhaarNumber.trim(),
-      dob: (dob || '').trim(),
-      gender: (gender || '').trim(),
-      currentAddress: (currentAddress || '').trim(),
-      permanentAddress: (permanentAddress || '').trim(),
-      state: (state || '').trim(),
-      district: (district || '').trim(),
-      pincode: (pincode || '').trim(),
-      education: (education || '').trim(),
-      experience: (experience || '').trim(),
-      preferredLocation: (preferredLocation || '').trim(),
-      position,
-      expectedSalary: (expectedSalary || '').trim(),
-      readyToRelocate: (readyToRelocate || '').trim(),
-      policeVerification: (policeVerification || '').trim(),
+      email: email.trim(),
+      address: address.trim(),
+      qualification: qualification.trim(),
+      experience: experience.trim(),
+      position: position.trim(),
       files: {
         resume: resumeFile ? `/uploads/${resumeFile.filename}` : null,
         aadhaar: `/uploads/${aadhaarFile.filename}`,
@@ -546,13 +552,14 @@ app.post('/api/careers/manpower', (req, res) => {
 
     apps.push(newApp);
     if (writeDb('manpower_applications.json', apps)) {
-      const emailBody = `Manpower Job Application Received
+      const emailBody = `Manpower Job Application Received (Simplified)
 Full Name: ${newApp.name}
 Position: ${newApp.position}
 Phone: ${newApp.phone}
-Aadhaar Number: ${newApp.aadhaarNumber}
-Preferred Location: ${newApp.preferredLocation}
-Expected Salary: ${newApp.expectedSalary}`;
+Email: ${newApp.email}
+Address: ${newApp.address}
+Qualification: ${newApp.qualification}
+Experience: ${newApp.experience}`;
 
       const attachments = [];
       if (resumeFile) attachments.push({ filename: resumeFile.originalname, path: resumeFile.path });
@@ -574,34 +581,22 @@ Expected Salary: ${newApp.expectedSalary}`;
 // 5c. GET /api/export/corporate - Download Corporate CSV spreadsheet
 app.get('/api/export/corporate', (req, res) => {
   const apps = readDb('corporate_applications.json');
-  let csv = '\ufeffID,Applied At,Full Name,Father\'s Name,Phone,WhatsApp,Email,Date of Birth,Gender,Current Address,Permanent Address,Highest Qualification,Experience,Current Company,Current Salary,Expected Salary,Preferred Job Location,Position Applying For,Notice Period,Skills,Resume Path,Aadhaar Path,Photo Path,Cover Letter\n';
+  let csv = '\ufeffID,Applied At,Full Name,Phone,Email,Address,Qualification,Experience,Position,Resume Path,Aadhaar Path,Photo Path\n';
   
   apps.forEach(app => {
     csv += [
       app.id,
       app.appliedAt,
       app.name,
-      app.fatherName,
       app.phone,
-      app.whatsapp,
       app.email,
-      app.dob,
-      app.gender,
-      app.currentAddress,
-      app.permanentAddress,
+      app.address,
       app.qualification,
       app.experience,
-      app.currentCompany,
-      app.currentSalary,
-      app.expectedSalary,
-      app.preferredLocation,
       app.position,
-      app.noticePeriod,
-      app.skills,
       app.files ? app.files.resume : '',
       app.files ? app.files.aadhaar : '',
-      app.files ? app.files.photo : '',
-      app.message
+      app.files ? app.files.photo : ''
     ].map(escapeCSV).join(',') + '\n';
   });
   
@@ -613,31 +608,19 @@ app.get('/api/export/corporate', (req, res) => {
 // 5d. GET /api/export/manpower - Download Manpower CSV spreadsheet
 app.get('/api/export/manpower', (req, res) => {
   const apps = readDb('manpower_applications.json');
-  let csv = '\ufeffID,Applied At,Full Name,Father\'s Name,Phone,WhatsApp,Aadhaar Number,Date of Birth,Gender,Current Address,Permanent Address,State,District,PIN Code,Education,Experience,Preferred Job Location,Position Applying For,Expected Salary,Ready to Relocate,Police Verification Available,Resume Path,Aadhaar Path,Photo Path\n';
+  let csv = '\ufeffID,Applied At,Full Name,Phone,Email,Address,Qualification,Experience,Position,Resume Path,Aadhaar Path,Photo Path\n';
   
   apps.forEach(app => {
     csv += [
       app.id,
       app.appliedAt,
       app.name,
-      app.fatherName,
       app.phone,
-      app.whatsapp,
-      app.aadhaarNumber,
-      app.dob,
-      app.gender,
-      app.currentAddress,
-      app.permanentAddress,
-      app.state,
-      app.district,
-      app.pincode,
-      app.education,
+      app.email,
+      app.address,
+      app.qualification,
       app.experience,
-      app.preferredLocation,
       app.position,
-      app.expectedSalary,
-      app.readyToRelocate,
-      app.policeVerification,
       app.files ? app.files.resume : '',
       app.files ? app.files.aadhaar : '',
       app.files ? app.files.photo : ''
