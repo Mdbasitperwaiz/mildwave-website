@@ -525,9 +525,11 @@ window.handleRecruitmentFileSelect = function(event, key) {
   const meta = document.getElementById(`${key}-meta`);
   
   const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+  const maxLimit = key.endsWith('photo') ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
+  const limitLabel = key.endsWith('photo') ? "2MB" : "5MB";
   
-  if (file.size > 5 * 1024 * 1024) {
-    showToastNotification("File size exceeds 5MB limit", "error");
+  if (file.size > maxLimit) {
+    showToastNotification(`File size exceeds ${limitLabel} limit`, "error");
     event.target.value = '';
     if (zone) {
       zone.classList.remove('selected');
@@ -569,9 +571,17 @@ window.handleRecruitmentSubmit = function(event, portalType) {
   }
   
   const email = document.getElementById(`${prefix}-email`);
-  if (email && !validateEmail(email.value)) {
-    highlightError(email, false);
-    isValid = false;
+  // Email is optional for manpower, but if filled, it must be valid.
+  if (email && email.value.trim() !== '') {
+    if (!validateEmail(email.value)) {
+      highlightError(email, false);
+      isValid = false;
+    }
+  } else if (email && email.hasAttribute('required')) {
+    if (!validateEmail(email.value)) {
+      highlightError(email, false);
+      isValid = false;
+    }
   }
   
   const address = document.getElementById(`${prefix}-address`);
@@ -580,26 +590,106 @@ window.handleRecruitmentSubmit = function(event, portalType) {
     isValid = false;
   }
   
-  const qualification = document.getElementById(`${prefix}-qualification`);
-  if (qualification && qualification.value.trim().length < 2) {
-    highlightError(qualification, false);
-    isValid = false;
-  }
-  
-  const experience = document.getElementById(`${prefix}-experience`);
-  if (experience && experience.value.trim().length < 1) {
-    highlightError(experience, false);
-    isValid = false;
-  }
-  
-  const aadhaarInput = document.getElementById(`${prefix}-file-aadhaar`);
-  const aadhaarZone = document.getElementById(`${prefix}-aadhaar-dropzone`);
-  if (!aadhaarInput || aadhaarInput.files.length === 0) {
-    if (aadhaarZone) aadhaarZone.style.borderColor = '#ef4444';
-    isValid = false;
-    showToastNotification("Aadhaar Card upload is mandatory.", "error");
+  if (portalType === 'corporate') {
+    const qualification = document.getElementById('corp-qualification');
+    if (qualification && qualification.value.trim().length < 2) {
+      highlightError(qualification, false);
+      isValid = false;
+    }
+    
+    const experience = document.getElementById('corp-experience');
+    if (experience && experience.value.trim().length < 1) {
+      highlightError(experience, false);
+      isValid = false;
+    }
+
+    const skills = document.getElementById('corp-skills');
+    if (skills && skills.value.trim().length < 2) {
+      highlightError(skills, false);
+      isValid = false;
+    }
+
+    const certifications = document.getElementById('corp-certifications');
+    if (certifications && certifications.value.trim().length < 2) {
+      highlightError(certifications, false);
+      isValid = false;
+    }
+    
+    const resumeInput = document.getElementById('corp-file-resume');
+    const resumeZone = document.getElementById('corp-resume-dropzone');
+    if (!resumeInput || resumeInput.files.length === 0) {
+      if (resumeZone) resumeZone.style.borderColor = '#ef4444';
+      isValid = false;
+      showToastNotification("Resume upload is mandatory for professional roles.", "error");
+    } else {
+      if (resumeZone) resumeZone.style.borderColor = '#cbd5e1';
+    }
   } else {
-    if (aadhaarZone) aadhaarZone.style.borderColor = '#cbd5e1';
+    const aadhaarNum = document.getElementById('man-aadhaar-num');
+    if (aadhaarNum && (aadhaarNum.value.trim().length !== 12 || isNaN(aadhaarNum.value.trim()))) {
+      highlightError(aadhaarNum, false);
+      isValid = false;
+      showToastNotification("Aadhaar Card Number must be exactly 12 digits.", "error");
+    }
+
+    const panNum = document.getElementById('man-pan-num');
+    if (panNum && panNum.value.trim() !== '') {
+      if (panNum.value.trim().length !== 10) {
+        highlightError(panNum, false);
+        isValid = false;
+        showToastNotification("PAN Card Number must be exactly 10 characters.", "error");
+      }
+    }
+
+    const education = document.getElementById('man-education');
+    if (education && education.value === '') {
+      highlightError(education, false);
+      isValid = false;
+    }
+
+    const experience = document.getElementById('man-experience');
+    if (experience && experience.value.trim().length < 1) {
+      highlightError(experience, false);
+      isValid = false;
+    }
+
+    const police = document.getElementById('man-police');
+    if (police && police.value === '') {
+      highlightError(police, false);
+      isValid = false;
+    }
+
+    const relocate = document.getElementById('man-relocate');
+    if (relocate && relocate.value === '') {
+      highlightError(relocate, false);
+      isValid = false;
+    }
+
+    const shift = document.getElementById('man-shift');
+    if (shift && shift.value === '') {
+      highlightError(shift, false);
+      isValid = false;
+    }
+
+    const aadhaarInput = document.getElementById('man-file-aadhaar');
+    const aadhaarZone = document.getElementById('man-aadhaar-dropzone');
+    if (!aadhaarInput || aadhaarInput.files.length === 0) {
+      if (aadhaarZone) aadhaarZone.style.borderColor = '#ef4444';
+      isValid = false;
+      showToastNotification("Aadhaar Card upload is mandatory.", "error");
+    } else {
+      if (aadhaarZone) aadhaarZone.style.borderColor = '#cbd5e1';
+    }
+
+    const photoInput = document.getElementById('man-file-photo');
+    const photoZone = document.getElementById('man-photo-dropzone');
+    if (!photoInput || photoInput.files.length === 0) {
+      if (photoZone) photoZone.style.borderColor = '#ef4444';
+      isValid = false;
+      showToastNotification("Passport photograph is mandatory.", "error");
+    } else {
+      if (photoZone) photoZone.style.borderColor = '#cbd5e1';
+    }
   }
   
   const recaptchaCheck = document.getElementById(`${prefix}-recaptcha-check`);
@@ -681,7 +771,7 @@ window.handleRecruitmentSubmit = function(event, portalType) {
 };
 
 function resetRecruitmentUploadUI(prefix) {
-  const fields = ['resume', 'aadhaar', 'photo'];
+  const fields = ['resume', 'aadhaar', 'photo', 'pan'];
   fields.forEach(field => {
     const input = document.getElementById(`${prefix}-file-${field}`);
     if (input) input.value = '';
@@ -704,7 +794,10 @@ function resetRecruitmentUploadUI(prefix) {
         meta.textContent = "PDF, JPG, JPEG, or PNG format (Max size 5MB)";
       } else if (field === 'photo') {
         title.textContent = "Click or drag & drop Photo here";
-        meta.textContent = "JPG, JPEG, or PNG format (Max size 5MB)";
+        meta.textContent = "JPG, JPEG, or PNG format (Max size 2MB)";
+      } else if (field === 'pan') {
+        title.textContent = "Click or drag & drop PAN Card here";
+        meta.textContent = "PDF, JPG, JPEG, or PNG format (Max size 5MB)";
       }
     }
   });
@@ -1667,6 +1760,17 @@ window.filterJobs = function() {
   renderActivePortalJobs();
 };
 
+function isManpowerRole(title) {
+  const manpowerRoles = [
+    "housekeeping staff", "housekeeping supervisor", "security guard", "security supervisor",
+    "office boy", "pantry boy", "cleaner", "janitor", "gardener", "driver", "helper",
+    "loading & unloading staff", "factory worker", "production worker", "machine operator",
+    "ward boy", "aya", "caregiver"
+  ];
+  const lowerTitle = title.toLowerCase();
+  return manpowerRoles.some(role => lowerTitle.includes(role));
+}
+
 window.openApplicationForm = function(jobId) {
   const job = [...CORPORATE_JOBS, ...MANPOWER_JOBS].find(j => j.id === jobId);
   if (!job) return;
@@ -1674,10 +1778,10 @@ window.openApplicationForm = function(jobId) {
   document.getElementById('job-board-view').style.display = 'none';
   document.getElementById('application-form-view').style.display = 'block';
   
-  const isCorp = CORPORATE_JOBS.some(j => j.id === jobId);
+  const isManpower = isManpowerRole(job.title);
   const badge = document.getElementById('form-job-badge');
-  badge.textContent = isCorp ? 'Corporate Division' : 'Manpower Division';
-  badge.className = `job-category-pill ${isCorp ? 'category-corp' : 'category-manpower'}`;
+  badge.textContent = isManpower ? 'Manpower Division' : 'Professional Division';
+  badge.className = `job-category-pill ${isManpower ? 'category-manpower' : 'category-corp'}`;
   
   document.getElementById('form-job-title').textContent = job.title;
   document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}`;
@@ -1690,7 +1794,7 @@ window.openApplicationForm = function(jobId) {
   manForm.style.display = 'none';
   successPanel.style.display = 'none';
   
-  if (isCorp) {
+  if (!isManpower) {
     corpForm.style.display = 'block';
     corpForm.reset();
     document.getElementById('corp-hidden-position').value = job.title;
