@@ -115,6 +115,7 @@
             <li><a href="#projects">Projects</a></li>
             <li><a href="#about">About Us</a></li>
             <li><a href="#documents">Documents</a></li>
+            <li><a href="flyer.html" target="_blank" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
             <li><a href="#careers">Careers</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -151,6 +152,7 @@
       <li><a href="#projects" onclick="closeMobileMenu()">Projects</a></li>
       <li><a href="#about" onclick="closeMobileMenu()">About Us</a></li>
       <li><a href="#documents" onclick="closeMobileMenu()">Documents</a></li>
+      <li><a href="flyer.html" target="_blank" onclick="closeMobileMenu()" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
       <li><a href="#careers" onclick="closeMobileMenu()">Careers</a></li>
       <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
     </ul>
@@ -1384,6 +1386,19 @@
                 </div>
                 <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="downloadMockPDF('Master_MSA_Terms_Mildwave.pdf')"><i data-lucide="download"></i> Download PDF</button>
               </article>
+
+              <!-- Doc 6 (Corporate Flyer) -->
+              <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                <div>
+                  <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                    <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="award"></i></div>
+                    <span class="doc-meta" style="background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full);">A4 PRINT-READY</span>
+                  </div>
+                  <h3 style="font-size: 1.25rem; margin-bottom: 8px;">Corporate Marketing Flyer</h3>
+                  <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 24px;">Premium A4 vertical flyer detailing Manpower Rates, RO AMC packages, Pest Control solutions, and Tank Cleaning.</p>
+                </div>
+                <a href="flyer.html" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; text-decoration: none; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 8px;"><i data-lucide="external-link"></i> View &amp; Print Flyer</a>
+              </article>
             </div>
           </div>
 
@@ -1724,6 +1739,37 @@
           <p>Your request has been submitted successfully.</p>
           <button class="btn btn-outline btn-sm" style="margin-top: 20px;" onclick="toggleQuoteModal(false)">Close Window</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP MODAL: RECRUITMENT FALLBACK SUBMISSION -->
+  <div class="quote-modal" id="recruitment-fallback-modal">
+    <div class="quote-modal-card" style="max-width: 600px;">
+      <div class="quote-modal-header">
+        <h3>Application Submission Fallback</h3>
+        <div class="quote-modal-close" onclick="toggleRecruitmentFallbackModal(false)">&times;</div>
+      </div>
+      <div class="quote-modal-body" style="text-align: center; padding: 30px 20px;">
+        <div class="success-icon-anim" style="background-color: #fef3c7; color: #d97706; box-shadow: 0 6px 15px rgba(217, 119, 6, 0.15); margin: 0 auto 20px auto; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem;">
+          <i data-lucide="alert-triangle"></i>
+        </div>
+        <h4 style="font-size: 1.35rem; margin-bottom: 12px; font-weight: 700; color: var(--text-dark);">Online Submission Issue</h4>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6;">
+          We encountered an issue submitting your application to the server. Don't worry, you can instantly submit your application details directly via <strong>WhatsApp</strong> or <strong>Email</strong> to our HR team instead.
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <a href="#" id="fallback-whatsapp-btn" target="_blank" class="btn btn-primary" style="background-color: #25d366; border-color: #25d366; display: flex; align-items: center; justify-content: center; gap: 8px; color: white;">
+            <i data-lucide="message-square"></i> Submit via WhatsApp
+          </a>
+          <a href="#" id="fallback-email-btn" target="_blank" class="btn btn-outline" style="display: flex; align-items: center; justify-content: center; gap: 8px; border-color: var(--primary); color: var(--primary);">
+            <i data-lucide="mail"></i> Submit via Email
+          </a>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
+          * Note: Please remember to manually attach your resume / Aadhaar card / passport size photograph in the WhatsApp chat or email.
+        </p>
       </div>
     </div>
   </div>

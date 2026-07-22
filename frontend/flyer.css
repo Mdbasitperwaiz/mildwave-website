@@ -1,0 +1,929 @@
+/* ==========================================
+   PREMIUM A4 CORPORATE FLYER STYLESHEET
+   MILDWAVE MARKETING PVT. LTD.
+   ========================================== */
+
+/* Design Tokens & Variables */
+:root {
+  --navy-dark: #071536;
+  --navy: #0B1F52;
+  --navy-light: #16327c;
+  --gold: #D4A017;
+  --gold-light: #e5b83b;
+  --gold-bg: rgba(212, 160, 23, 0.1);
+  --white: #FFFFFF;
+  --light-grey: #F4F6F9;
+  --border-grey: #E2E8F0;
+  --text-dark: #1E293B;
+  --text-muted: #64748B;
+  
+  /* Section Theme Accent Colors */
+  --accent-blue: #2563EB;
+  --accent-blue-bg: rgba(37, 99, 235, 0.05);
+  --accent-teal: #0D9488;
+  --accent-teal-bg: rgba(13, 148, 136, 0.05);
+  --accent-green: #16A34A;
+  --accent-green-bg: rgba(22, 163, 74, 0.05);
+  --accent-purple: #7C3AED;
+  --accent-purple-bg: rgba(124, 58, 237, 0.05);
+}
+
+/* Global Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background-color: #E2E8F0;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 40px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* Print Control Bar */
+.preview-controls {
+  background-color: var(--navy-dark);
+  color: var(--white);
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-badge {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-badge i {
+  color: var(--gold);
+  width: 16px;
+  height: 16px;
+}
+
+.btn-print {
+  background-color: var(--gold);
+  color: var(--navy-dark);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-print:hover {
+  background-color: var(--gold-light);
+  transform: translateY(-1px);
+}
+
+/* A4 Container & Page Sizing for Screen */
+.flyer-container {
+  margin: 30px auto;
+  max-width: 210mm;
+}
+
+.page {
+  background-color: var(--white);
+  width: 210mm;
+  height: 297mm;
+  padding: 10mm 12mm;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Header Styling */
+.flyer-header {
+  background: linear-gradient(135deg, rgba(7, 21, 54, 0.95) 0%, rgba(11, 31, 82, 0.85) 100%), 
+              url('assets/office_buildings_header_bg.png');
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  padding: 16px 20px;
+  position: relative;
+  color: var(--white);
+  margin-bottom: 12px;
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.company-logo {
+  height: 52px;
+  width: auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-title-area {
+  flex-grow: 1;
+}
+
+.company-name {
+  color: var(--white);
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.tagline {
+  font-size: 0.72rem;
+  color: #CBD5E1;
+  font-weight: 500;
+  max-width: 500px;
+  line-height: 1.25;
+}
+
+.header-ribbon {
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--navy-dark);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-top: 10px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Company Overview & Highlights */
+.overview-section {
+  margin-bottom: 12px;
+}
+
+.description-card {
+  background-color: var(--light-grey);
+  border-left: 4px solid var(--gold);
+  border-radius: 4px 8px 8px 4px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+
+.company-desc {
+  font-size: 0.7rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.highlight-item {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 8px;
+  padding: 6px 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.highlight-icon-wrapper {
+  background: var(--gold-bg);
+  color: var(--gold);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.highlight-icon-wrapper i {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+}
+
+.highlight-info h4 {
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--navy-dark);
+}
+
+.highlight-info p {
+  font-size: 0.52rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Services Sections Common */
+.services-section {
+  border: 1px solid var(--border-grey);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.section-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--border-grey);
+  padding-bottom: 4px;
+}
+
+.section-number {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  text-transform: uppercase;
+}
+
+/* Service Variations */
+.section-blue {
+  border-top: 4px solid var(--accent-blue);
+  background-color: var(--accent-blue-bg);
+}
+.section-blue .section-number,
+.section-blue .section-title {
+  color: var(--accent-blue);
+}
+
+.section-teal {
+  border-top: 4px solid var(--accent-teal);
+  background-color: var(--accent-teal-bg);
+}
+.section-teal .section-number,
+.section-teal .section-title {
+  color: var(--accent-teal);
+}
+
+.section-green {
+  border-top: 4px solid var(--accent-green);
+  background-color: var(--accent-green-bg);
+}
+.section-green .section-number,
+.section-green .section-title {
+  color: var(--accent-green);
+}
+
+.section-purple {
+  border-top: 4px solid var(--accent-purple);
+  background-color: var(--accent-purple-bg);
+}
+.section-purple .section-number,
+.section-purple .section-title {
+  color: var(--accent-purple);
+}
+
+.section-navy {
+  border-top: 4px solid var(--navy);
+  background-color: rgba(11, 31, 82, 0.02);
+}
+.section-navy .section-number,
+.section-navy .section-title {
+  color: var(--navy);
+}
+
+/* Section 1 Details: Manpower Supply */
+.manpower-container {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.manpower-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-intro {
+  font-size: 0.68rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.manpower-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.manpower-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.65rem;
+}
+
+.manpower-bullets li i {
+  color: var(--accent-blue);
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.manpower-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.manpower-badge-card {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 6px;
+  padding: 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+}
+
+.manpower-badge-card i {
+  color: var(--accent-blue);
+  width: 16px;
+  height: 16px;
+}
+
+.manpower-badge-card span {
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+/* Clean Professional Tables */
+.manpower-table-wrapper {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.table-header-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-header-title i {
+  width: 12px;
+  height: 12px;
+  color: var(--gold);
+}
+
+.flyer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.65rem;
+}
+
+.flyer-table th {
+  background-color: var(--navy);
+  color: var(--white);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.flyer-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #E2E8F0;
+  color: #334155;
+}
+
+.flyer-table tbody tr:nth-child(even) {
+  background-color: var(--light-grey);
+}
+
+.flyer-table .price {
+  font-weight: 700;
+  color: var(--navy-light);
+}
+
+.table-highlight-row {
+  background-color: var(--gold-bg) !important;
+  font-weight: 700;
+  border-bottom: 2px solid var(--gold) !important;
+}
+
+.table-highlight-row td {
+  color: var(--navy) !important;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.table-note {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Indicators */
+.page-footer-indicator {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-grey);
+  padding-top: 6px;
+  margin-top: auto;
+}
+
+/* ================= PAGE 2 STYLES ================= */
+.page2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.grid-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.service-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subsection-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--navy);
+  border-left: 3px solid var(--gold);
+  padding-left: 6px;
+  margin-top: 4px;
+}
+
+.table-mini {
+  font-size: 0.62rem;
+}
+.table-mini th {
+  padding: 3px 6px;
+}
+.table-mini td {
+  padding: 3.5px 6px;
+}
+
+/* RO Specifics */
+.ro-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.service-img {
+  width: 100%;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-grey);
+}
+
+.highlight-price-card {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #115e59 100%);
+  color: var(--white);
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(13,148,136,0.15);
+}
+
+.highlight-price-card .label {
+  font-size: 0.52rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.highlight-price-card .value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gold);
+  display: block;
+  line-height: 1.1;
+  margin: 1px 0;
+}
+
+.highlight-price-card .sub {
+  font-size: 0.45rem;
+  opacity: 0.8;
+  display: block;
+}
+
+.brand-strip {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.brand-title {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.brands-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.brands-grid span {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--navy);
+  background-color: var(--light-grey);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #E2E8F0;
+}
+
+.brands-grid .brands-all {
+  color: var(--white);
+  background-color: var(--gold);
+  border-color: var(--gold-light);
+}
+
+/* Pest Control Specifics */
+.pest-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.pest-termite-card {
+  background: var(--white);
+  border: 1.5px solid var(--accent-green);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.termite-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--accent-green);
+  text-transform: uppercase;
+}
+
+.termite-rate {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  line-height: 1;
+  margin: 2px 0;
+}
+
+.termite-rate .unit {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.termite-bullets {
+  list-style: none;
+}
+
+.termite-bullets li {
+  font-size: 0.52rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #334155;
+  margin-top: 2px;
+}
+
+.termite-bullets li i {
+  width: 10px;
+  height: 10px;
+  color: var(--accent-green);
+  stroke-width: 3;
+}
+
+/* Water Tank Specifics */
+.tank-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.tank-pricing {
+  width: 100%;
+}
+
+.process-wrapper {
+  margin-top: 4px;
+}
+
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.step-card {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 6px;
+  padding: 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.step-num {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 0.72rem;
+  color: var(--white);
+  background: var(--accent-purple);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-name {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* Why Choose Mildwave Grid */
+.why-choose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.why-card {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 6px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.why-card i {
+  color: var(--gold);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.title-star {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+  margin-top: 2px;
+}
+
+.why-content h5 {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  line-height: 1;
+}
+
+.why-content p {
+  font-size: 0.45rem;
+  color: var(--text-muted);
+  line-height: 1.1;
+}
+
+.industries-wrapper {
+  margin-top: 8px;
+}
+
+.industries-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.industry-tag {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--gold-bg);
+  border: 1px solid rgba(212, 160, 23, 0.25);
+  padding: 2.5px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.industry-tag i {
+  width: 10px;
+  height: 10px;
+  color: var(--gold);
+}
+
+/* Page 2 Footer Specifics */
+.flyer-footer {
+  background-color: var(--navy-dark);
+  border-top: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--white);
+  margin-top: 8px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 12px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-col-address {
+  grid-column: span 3;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 4px;
+}
+
+.footer-label {
+  font-size: 0.45rem;
+  text-transform: uppercase;
+  color: #94A3B8;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.footer-label i {
+  width: 8px;
+  height: 8px;
+  color: var(--gold);
+}
+
+.footer-val {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.footer-col-address .footer-val {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #E2E8F0;
+}
+
+
+/* ==========================================
+   PRINT MEDIA QUERY STYLES (A4 COMPLIANCE)
+   ========================================== */
+@media print {
+  /* Suppress browser default page margins and set layout */
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  
+  /* Reset background rendering for print */
+  body, html {
+    background-color: var(--white) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Hide preview/interactive bar */
+  .preview-controls {
+    display: none !important;
+  }
+  
+  /* Page structure setup */
+  .flyer-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 210mm !important;
+  }
+  
+  .page {
+    width: 210mm !important;
+    height: 297mm !important;
+    padding: 10mm 12mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+  
+  /* Prevent background image rendering issues */
+  .flyer-header {
+    background-image: url('assets/office_buildings_header_bg.png') !important;
+  }
+  
+  /* Allow interactive/clickable elements to show normal print colors */
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
