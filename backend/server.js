@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 const sendNotificationEmail = async (subject, textBody, attachments = []) => {
   const mailOptions = {
     from: `"Mildwave Notifications" <${process.env.GMAIL_USER || 'mildwavemmpatna@gmail.com'}>`,
-    to: 'mildwavemmpatna@gmail.com',
+    to: process.env.COMPANY_EMAIL || process.env.GMAIL_USER || 'mildwavempatna@gmail.com',
     subject: subject,
     text: textBody,
     attachments: attachments

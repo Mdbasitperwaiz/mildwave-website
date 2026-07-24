@@ -746,25 +746,27 @@ window.handleRecruitmentSubmit = function(event, portalType) {
         if (progressFill) progressFill.style.width = '0%';
       }, 500);
     } else {
-      let errMsg = "Submission failed. Please try again.";
+      let errMsg = "Submission failed.";
       try {
         const res = JSON.parse(xhr.responseText);
         if (res.error) errMsg = res.error;
       } catch (ex) {}
-      showToastNotification(errMsg, "error");
+      showToastNotification(errMsg + " Redirecting to fallback submission...", "error");
       
       setTimeout(() => {
         if (progressContainer) progressContainer.style.display = 'none';
-      }, 500);
+        window.showRecruitmentFallbackModal(portalType, form);
+      }, 1000);
     }
   });
   
   xhr.addEventListener('error', () => {
     if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-    showToastNotification("Network error occurred. Please try again.", "error");
+    showToastNotification("Network error occurred. Redirecting to fallback submission...", "error");
     setTimeout(() => {
       if (progressContainer) progressContainer.style.display = 'none';
-    }, 500);
+      window.showRecruitmentFallbackModal(portalType, form);
+    }, 1000);
   });
   
   xhr.send(formData);
@@ -1869,5 +1871,95 @@ window.toggleJobModal = function(show) {
     modal.classList.remove('active');
     document.body.style.overflow = 'auto';
   }
+};
+
+window.toggleRecruitmentFallbackModal = function(show) {
+  const modal = document.getElementById('recruitment-fallback-modal');
+  if (!modal) return;
+  
+  if (show) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  } else {
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+};
+
+window.showRecruitmentFallbackModal = function(portalType, form) {
+  const prefix = portalType === 'corporate' ? 'corp' : 'man';
+  
+  // Extract values dynamically
+  const name = form.querySelector(`[name="name"]`) ? form.querySelector(`[name="name"]`).value.trim() : '';
+  const phone = form.querySelector(`[name="phone"]`) ? form.querySelector(`[name="phone"]`).value.trim() : '';
+  const email = form.querySelector(`[name="email"]`) ? form.querySelector(`[name="email"]`).value.trim() : '';
+  const address = form.querySelector(`[name="address"]`) ? form.querySelector(`[name="address"]`).value.trim() : '';
+  const position = form.querySelector(`[name="position"]`) ? form.querySelector(`[name="position"]`).value.trim() : '';
+  
+  let msgText = '';
+  let subject = `Job Application: ${position} - ${name}`;
+  
+  if (portalType === 'corporate') {
+    const qualification = form.querySelector(`[name="qualification"]`) ? form.querySelector(`[name="qualification"]`).value.trim() : '';
+    const experience = form.querySelector(`[name="experience"]`) ? form.querySelector(`[name="experience"]`).value.trim() : '';
+    const skills = form.querySelector(`[name="skills"]`) ? form.querySelector(`[name="skills"]`).value.trim() : '';
+    const certifications = form.querySelector(`[name="certifications"]`) ? form.querySelector(`[name="certifications"]`).value.trim() : '';
+    const linkedin = form.querySelector(`[name="linkedin"]`) ? form.querySelector(`[name="linkedin"]`).value.trim() : '';
+    
+    msgText = `*Mildwave Marketing Corporate Job Application*
+----------------------------------------
+*Position:* ${position}
+*Full Name:* ${name}
+*Mobile Number:* ${phone}
+*Email:* ${email}
+*Address:* ${address}
+*Highest Qualification:* ${qualification}
+*Years of Experience:* ${experience}
+*Skills:* ${skills}
+*Certifications:* ${certifications}
+*LinkedIn:* ${linkedin || 'N/A'}
+
+Note: I am sending my Resume PDF/Word file as an attachment in this message.`;
+  } else {
+    const education = form.querySelector(`[name="education"]`) ? form.querySelector(`[name="education"]`).value : '';
+    const experience = form.querySelector(`[name="experience"]`) ? form.querySelector(`[name="experience"]`).value.trim() : '';
+    const aadhaar = form.querySelector(`[name="aadhaarNumber"]`) ? form.querySelector(`[name="aadhaarNumber"]`).value.trim() : '';
+    const pan = form.querySelector(`[name="panNumber"]`) ? form.querySelector(`[name="panNumber"]`).value.trim() : '';
+    const prevEmployer = form.querySelector(`[name="prevEmployer"]`) ? form.querySelector(`[name="prevEmployer"]`).value.trim() : '';
+    const police = form.querySelector(`[name="policeVerification"]`) ? form.querySelector(`[name="policeVerification"]`).value : '';
+    const relocate = form.querySelector(`[name="readyToRelocate"]`) ? form.querySelector(`[name="readyToRelocate"]`).value : '';
+    const shift = form.querySelector(`[name="prefShift"]`) ? form.querySelector(`[name="prefShift"]`).value : '';
+    
+    msgText = `*Mildwave Marketing Manpower Job Application*
+----------------------------------------
+*Position:* ${position}
+*Full Name:* ${name}
+*Mobile Number:* ${phone}
+*Email:* ${email || 'N/A'}
+*Address:* ${address}
+*Highest Education:* ${education}
+*Years of Experience:* ${experience}
+*Aadhaar Number:* ${aadhaar}
+*PAN Number:* ${pan || 'N/A'}
+*Previous Employer:* ${prevEmployer || 'N/A'}
+*Police Verification Available:* ${police}
+*Willing to Relocate:* ${relocate}
+*Preferred Work Shift:* ${shift}
+
+Note: I am sending my Aadhaar Card and Passport Photo as attachments in this message.`;
+  }
+  
+  // Format WhatsApp Link
+  const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(msgText)}`;
+  // Format Email Link
+  const mailUrl = `mailto:mildwavempatna@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msgText)}`;
+  
+  const waBtn = document.getElementById('fallback-whatsapp-btn');
+  const mailBtn = document.getElementById('fallback-email-btn');
+  
+  if (waBtn) waBtn.href = waUrl;
+  if (mailBtn) mailBtn.href = mailUrl;
+  
+  window.toggleRecruitmentFallbackModal(true);
 };
 
