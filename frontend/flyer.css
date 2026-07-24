@@ -5,27 +5,27 @@
 
 /* Design Tokens & Variables */
 :root {
-  --navy-dark: #071536;
+  --navy-dark: #071230;
   --navy: #0B1F52;
-  --navy-light: #16327c;
+  --navy-light: #162E6B;
   --gold: #D4A017;
-  --gold-light: #e5b83b;
-  --gold-bg: rgba(212, 160, 23, 0.1);
+  --gold-light: #F1C40F;
+  --gold-bg: rgba(212, 160, 23, 0.08);
   --white: #FFFFFF;
-  --light-grey: #F4F6F9;
+  --light-grey: #F8FAFC;
   --border-grey: #E2E8F0;
-  --text-dark: #1E293B;
-  --text-muted: #64748B;
+  --text-dark: #0F172A;
+  --text-muted: #475569;
   
   /* Section Theme Accent Colors */
-  --accent-blue: #2563EB;
-  --accent-blue-bg: rgba(37, 99, 235, 0.05);
-  --accent-teal: #0D9488;
-  --accent-teal-bg: rgba(13, 148, 136, 0.05);
-  --accent-green: #16A34A;
-  --accent-green-bg: rgba(22, 163, 74, 0.05);
-  --accent-purple: #7C3AED;
-  --accent-purple-bg: rgba(124, 58, 237, 0.05);
+  --accent-blue: #1E40AF;
+  --accent-blue-bg: #EFF6FF;
+  --accent-teal: #0F766E;
+  --accent-teal-bg: #F0FDFA;
+  --accent-green: #15803D;
+  --accent-green-bg: #F0FDF4;
+  --accent-purple: #6D28D9;
+  --accent-purple-bg: #F5F3FF;
 }
 
 /* Global Reset & Base */
@@ -38,8 +38,8 @@
 body {
   font-family: 'Inter', sans-serif;
   color: var(--text-dark);
-  background-color: #E2E8F0;
-  line-height: 1.4;
+  background-color: #CBD5E1;
+  line-height: 1.35;
   -webkit-font-smoothing: antialiased;
   padding-bottom: 40px;
 }
@@ -50,15 +50,32 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--navy);
 }
 
+.font-bold {
+  font-weight: 700;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.teal-text {
+  color: var(--accent-teal);
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
 /* Print Control Bar */
 .preview-controls {
   background-color: var(--navy-dark);
   color: var(--white);
-  padding: 12px 20px;
+  padding: 10px 20px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -75,7 +92,7 @@ h1, h2, h3, h4, h5, h6 {
 .preview-badge {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -83,23 +100,23 @@ h1, h2, h3, h4, h5, h6 {
 
 .preview-badge i {
   color: var(--gold);
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
 .btn-print {
   background-color: var(--gold);
   color: var(--navy-dark);
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 6px 14px;
+  border-radius: 4px;
   font-family: 'Outfit', sans-serif;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s ease;
 }
 
@@ -110,7 +127,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* A4 Container & Page Sizing for Screen */
 .flyer-container {
-  margin: 30px auto;
+  margin: 20px auto;
   max-width: 210mm;
 }
 
@@ -118,9 +135,9 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--white);
   width: 210mm;
   height: 297mm;
-  padding: 10mm 12mm;
+  padding: 8mm 10mm;
   margin-bottom: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -130,32 +147,32 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Header Styling */
 .flyer-header {
-  background: linear-gradient(135deg, rgba(7, 21, 54, 0.95) 0%, rgba(11, 31, 82, 0.85) 100%), 
+  background: linear-gradient(135deg, rgba(7, 18, 48, 0.96) 0%, rgba(11, 31, 82, 0.88) 100%), 
               url('assets/office_buildings_header_bg.png');
   background-size: cover;
   background-position: center;
-  border-radius: 12px;
-  padding: 16px 20px;
+  border-radius: 8px;
+  padding: 12px 16px;
   position: relative;
   color: var(--white);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border-bottom: 3px solid var(--gold);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .header-top {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .company-logo {
-  height: 52px;
+  height: 48px;
   width: auto;
-  background-color: rgba(255, 255, 255, 0.95);
-  padding: 4px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.98);
+  padding: 3px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .header-title-area {
@@ -164,299 +181,542 @@ h1, h2, h3, h4, h5, h6 {
 
 .company-name {
   color: var(--white);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   letter-spacing: 0.5px;
-  margin-bottom: 2px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  margin-bottom: 1px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 
 .tagline {
-  font-size: 0.72rem;
-  color: #CBD5E1;
+  font-size: 0.68rem;
+  color: #E2E8F0;
   font-weight: 500;
-  max-width: 500px;
-  line-height: 1.25;
+  max-width: 550px;
+  line-height: 1.2;
 }
 
 .header-ribbon {
-  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+  background: linear-gradient(90deg, var(--gold) 0%, #E6B01E 100%);
   color: var(--navy-dark);
   font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 0.75rem;
+  font-weight: 800;
+  font-size: 0.72rem;
   text-align: center;
-  padding: 4px 12px;
-  border-radius: 4px;
-  margin-top: 10px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-top: 8px;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Company Overview & Highlights */
+/* Company Overview */
 .overview-section {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .description-card {
   background-color: var(--light-grey);
-  border-left: 4px solid var(--gold);
-  border-radius: 4px 8px 8px 4px;
-  padding: 8px 12px;
-  margin-bottom: 10px;
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 6px 10px;
+  margin-bottom: 8px;
 }
 
 .company-desc {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: #334155;
-  line-height: 1.45;
+  line-height: 1.35;
+  font-weight: 500;
 }
 
 .highlight-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .highlight-item {
   background: var(--white);
   border: 1px solid var(--border-grey);
-  border-radius: 8px;
-  padding: 6px 4px;
+  border-radius: 6px;
+  padding: 5px 3px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
 .highlight-icon-wrapper {
   background: var(--gold-bg);
   color: var(--gold);
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  margin-bottom: 4px;
 }
 
 .highlight-icon-wrapper i {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   stroke-width: 2.5;
 }
 
 .highlight-info h4 {
-  font-size: 0.65rem;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 0.52rem;
+  font-weight: 800;
   color: var(--navy-dark);
+  line-height: 1.1;
 }
 
 .highlight-info p {
-  font-size: 0.52rem;
+  font-size: 0.45rem;
   color: var(--text-muted);
   font-weight: 500;
-}
-
-/* Services Sections Common */
-.services-section {
-  border: 1px solid var(--border-grey);
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-}
-
-.section-title-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  border-bottom: 2px solid var(--border-grey);
-  padding-bottom: 4px;
-}
-
-.section-number {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
   line-height: 1;
 }
 
-.section-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  text-transform: uppercase;
-}
-
-/* Service Variations */
-.section-blue {
-  border-top: 4px solid var(--accent-blue);
-  background-color: var(--accent-blue-bg);
-}
-.section-blue .section-number,
-.section-blue .section-title {
-  color: var(--accent-blue);
-}
-
-.section-teal {
-  border-top: 4px solid var(--accent-teal);
-  background-color: var(--accent-teal-bg);
-}
-.section-teal .section-number,
-.section-teal .section-title {
-  color: var(--accent-teal);
-}
-
-.section-green {
-  border-top: 4px solid var(--accent-green);
-  background-color: var(--accent-green-bg);
-}
-.section-green .section-number,
-.section-green .section-title {
-  color: var(--accent-green);
-}
-
-.section-purple {
-  border-top: 4px solid var(--accent-purple);
-  background-color: var(--accent-purple-bg);
-}
-.section-purple .section-number,
-.section-purple .section-title {
-  color: var(--accent-purple);
-}
-
-.section-navy {
-  border-top: 4px solid var(--navy);
-  background-color: rgba(11, 31, 82, 0.02);
-}
-.section-navy .section-number,
-.section-navy .section-title {
-  color: var(--navy);
-}
-
-/* Section 1 Details: Manpower Supply */
-.manpower-container {
+/* Page 1 Services 4-Column Grid */
+.services-columns-grid {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 14px;
-  align-items: start;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.manpower-details {
+.service-col-card {
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  height: 175mm; /* Fixed height to fit Page 1 perfectly */
 }
 
-.service-intro {
-  font-size: 0.68rem;
-  color: #475569;
-  line-height: 1.4;
+.card-blue {
+  border: 1.5px solid var(--accent-blue);
+  background-color: var(--accent-blue-bg);
+}
+.card-blue .col-header h3 { color: var(--accent-blue); }
+.card-blue .col-num { background-color: var(--accent-blue); }
+
+.card-teal {
+  border: 1.5px solid var(--accent-teal);
+  background-color: var(--accent-teal-bg);
+}
+.card-teal .col-header h3 { color: var(--accent-teal); }
+.card-teal .col-num { background-color: var(--accent-teal); }
+
+.card-green {
+  border: 1.5px solid var(--accent-green);
+  background-color: var(--accent-green-bg);
+}
+.card-green .col-header h3 { color: var(--accent-green); }
+.card-green .col-num { background-color: var(--accent-green); }
+
+.card-purple {
+  border: 1.5px solid var(--accent-purple);
+  background-color: var(--accent-purple-bg);
+}
+.card-purple .col-header h3 { color: var(--accent-purple); }
+.card-purple .col-num { background-color: var(--accent-purple); }
+
+.col-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 6px;
 }
 
-.manpower-bullets {
+.col-num {
+  font-family: 'Outfit', sans-serif;
+  color: var(--white);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.col-header h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.col-image-wrapper {
+  width: 100%;
+  height: 48mm;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  border: 1px solid var(--border-grey);
+}
+
+.col-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.col-bullets {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3.5px;
+  margin-bottom: 6px;
 }
 
-.manpower-bullets li {
+.col-bullets li {
+  font-size: 0.52rem;
+  color: #334155;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 0.65rem;
+  align-items: center;
+  gap: 3px;
+  font-weight: 500;
 }
 
-.manpower-bullets li i {
-  color: var(--accent-blue);
-  width: 14px;
-  height: 14px;
-  margin-top: 1px;
+.col-bullets li i {
+  width: 8px;
+  height: 8px;
+  stroke-width: 3.5;
+  color: var(--navy);
   flex-shrink: 0;
 }
 
-.manpower-badges-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.manpower-badge-card {
+/* Badges for columns */
+.col-badge-wrapper {
   background: var(--white);
   border: 1px solid var(--border-grey);
-  border-radius: 6px;
-  padding: 6px;
+  border-radius: 4px;
+  padding: 4px;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.01);
 }
 
-.manpower-badge-card i {
-  color: var(--accent-blue);
-  width: 16px;
-  height: 16px;
+.border-top-dashed {
+  border-top: 1px dashed var(--border-grey);
 }
 
-.manpower-badge-card span {
-  font-size: 0.55rem;
-  font-weight: 600;
-  color: var(--navy);
+.col-badge {
+  font-size: 0.45rem;
+  color: var(--navy-dark);
+  line-height: 1.1;
 }
 
-/* Clean Professional Tables */
-.manpower-table-wrapper {
-  background: var(--white);
-  border: 1px solid var(--border-grey);
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+.col-badge-sub {
+  font-size: 0.4rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 1px;
 }
 
-.table-header-title {
+.col-price-badge {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #115e59 100%);
+  color: var(--white);
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.col-price-badge .price-val {
   font-family: 'Outfit', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.table-header-title i {
-  width: 12px;
-  height: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
   color: var(--gold);
 }
 
+.col-price-badge .price-label {
+  font-size: 0.45rem;
+  color: var(--white);
+}
+
+.col-price-badge .price-desc {
+  font-size: 0.4rem;
+  opacity: 0.9;
+}
+
+.col-brands-logo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.col-brands-logo span {
+  font-size: 0.42rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+.col-price-card-solid {
+  color: var(--white);
+  border-radius: 4px;
+  padding: 6px;
+  text-align: center;
+  margin-top: auto;
+}
+
+.bg-green-solid {
+  background-color: var(--accent-green);
+  border: 1px solid #166534;
+}
+
+.bg-purple-solid {
+  background-color: var(--accent-purple);
+  border: 1px solid #5b21b6;
+}
+
+.col-price-card-solid .card-label {
+  font-size: 0.42rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+
+.col-price-card-solid .card-price {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+}
+
+/* Why Choose Section */
+.why-choose-section {
+  background: var(--light-grey);
+  border: 1px solid var(--border-grey);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+
+.block-title-center {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--navy);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.why-card-row {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 4px;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.why-card-row i {
+  color: var(--gold);
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  stroke-width: 2.5;
+}
+
+.why-card-row span {
+  font-size: 0.48rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  line-height: 1.1;
+}
+
+/* We Proudly Serve */
+.serve-section {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.serve-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.serve-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.serve-tag {
+  font-size: 0.48rem;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--gold-bg);
+  border: 1px solid rgba(212, 160, 23, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.serve-tag i {
+  width: 9px;
+  height: 9px;
+  color: var(--gold);
+}
+
+.bottom-gov-ribbon {
+  background: linear-gradient(90deg, var(--navy) 0%, var(--navy-dark) 100%);
+  color: var(--white);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 0.58rem;
+  text-align: center;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-top: auto;
+}
+
+/* ================= PAGE 2 STYLES ================= */
+.page2-section {
+  border: 1px solid var(--border-grey);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.section-navy-header { border-top: 3px solid var(--navy); background-color: rgba(11, 31, 82, 0.01); }
+.section-teal-header { border-top: 3px solid var(--accent-teal); background-color: var(--accent-teal-bg); }
+.section-green-header { border-top: 3px solid var(--accent-green); background-color: var(--accent-green-bg); }
+.section-purple-header { border-top: 3px solid var(--accent-purple); background-color: var(--accent-purple-bg); }
+
+.section-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1.5px solid var(--border-grey);
+  padding-bottom: 3px;
+}
+
+.section-badge {
+  font-family: 'Outfit', sans-serif;
+  color: var(--white);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.52rem;
+  font-weight: 800;
+}
+
+.section-navy-header .section-badge { background-color: var(--navy); }
+.section-teal-header .section-badge { background-color: var(--accent-teal); }
+.section-green-header .section-badge { background-color: var(--accent-green); }
+.section-purple-header .section-badge { background-color: var(--accent-purple); }
+
+.section-title-bar h2 {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.section-navy-header h2 { color: var(--navy); }
+.section-teal-header h2 { color: var(--accent-teal); }
+.section-green-header h2 { color: var(--accent-green); }
+.section-purple-header h2 { color: var(--accent-purple); }
+
+/* Double Column Manpower Table */
+.manpower-double-table-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.manpower-note-block {
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-left: 3px solid var(--gold);
+  padding: 4px 6px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 0 4px 4px 0;
+}
+
+.manpower-note-block i {
+  color: var(--gold);
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.manpower-note-block p {
+  font-size: 0.48rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* Page 2 Tables styling */
 .flyer-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.65rem;
+  font-size: 0.58rem;
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  border-radius: 4px;
 }
 
 .flyer-table th {
   background-color: var(--navy);
   color: var(--white);
   font-family: 'Outfit', sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   text-align: left;
-  padding: 4px 8px;
-  border-bottom: 2px solid var(--gold);
+  padding: 3px 6px;
+  font-size: 0.52rem;
+  letter-spacing: 0.2px;
 }
 
+.section-teal-header .flyer-table th { background-color: var(--accent-teal); }
+.section-green-header .flyer-table th { background-color: var(--accent-green); }
+.section-purple-header .flyer-table th { background-color: var(--accent-purple); }
+
 .flyer-table td {
-  padding: 4px 8px;
+  padding: 2.5px 6px;
   border-bottom: 1px solid #E2E8F0;
-  color: #334155;
+  color: #1E293B;
+  font-weight: 500;
 }
 
 .flyer-table tbody tr:nth-child(even) {
@@ -465,425 +725,380 @@ h1, h2, h3, h4, h5, h6 {
 
 .flyer-table .price {
   font-weight: 700;
-  color: var(--navy-light);
+  color: var(--navy-dark);
 }
 
 .table-highlight-row {
   background-color: var(--gold-bg) !important;
   font-weight: 700;
-  border-bottom: 2px solid var(--gold) !important;
 }
 
 .table-highlight-row td {
   color: var(--navy) !important;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.table-note {
-  font-size: 0.5rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-  font-style: italic;
-}
-
-/* Indicators */
-.page-footer-indicator {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border-grey);
-  padding-top: 6px;
-  margin-top: auto;
-}
-
-/* ================= PAGE 2 STYLES ================= */
-.page2-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: start;
-}
-
-.grid-column {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.service-block {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.subsection-title {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--navy);
-  border-left: 3px solid var(--gold);
-  padding-left: 6px;
-  margin-top: 4px;
+  font-weight: 700 !important;
 }
 
 .table-mini {
-  font-size: 0.62rem;
-}
-.table-mini th {
-  padding: 3px 6px;
+  font-size: 0.55rem;
 }
 .table-mini td {
-  padding: 3.5px 6px;
+  padding: 2.2px 5px;
+}
+.table-mini td .muted {
+  font-size: 0.45rem;
 }
 
-/* RO Specifics */
-.ro-layout {
+/* Page 2 Middle Sections Grid */
+.page2-middle-grid {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1.05fr 0.95fr;
   gap: 8px;
+  margin-bottom: 8px;
+}
+
+.p2-sub-title {
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 4px;
+  border-left: 2px solid var(--gold);
+  padding-left: 4px;
+  text-transform: uppercase;
+}
+
+.section-teal-header .p2-sub-title { border-left-color: var(--accent-teal); }
+.section-green-header .p2-sub-title { border-left-color: var(--accent-green); }
+.section-purple-header .p2-sub-title { border-left-color: var(--accent-purple); }
+
+/* RO Section details */
+.ro-p2-header-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 6px;
+  margin-bottom: 6px;
   align-items: center;
 }
 
-.service-img {
-  width: 100%;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 8px;
+.ro-p2-visual {
+  height: 52px;
+  border-radius: 4px;
+  overflow: hidden;
   border: 1px solid var(--border-grey);
 }
 
-.highlight-price-card {
-  background: linear-gradient(135deg, var(--accent-teal) 0%, #115e59 100%);
+.ro-p2-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ro-p2-charge-card {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #0f766e 100%);
   color: var(--white);
-  border-radius: 8px;
-  padding: 6px 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(13,148,136,0.15);
+  box-shadow: 0 2px 4px rgba(13,148,136,0.1);
 }
 
-.highlight-price-card .label {
-  font-size: 0.52rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: block;
+.ro-p2-charge-card .charge-label {
+  font-size: 0.42rem;
+  font-weight: 700;
 }
 
-.highlight-price-card .value {
+.ro-p2-charge-card .charge-price {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--gold);
-  display: block;
-  line-height: 1.1;
-  margin: 1px 0;
+  line-height: 1;
 }
 
-.highlight-price-card .sub {
-  font-size: 0.45rem;
-  opacity: 0.8;
-  display: block;
-}
-
-.brand-strip {
-  background: var(--white);
-  border: 1px solid var(--border-grey);
-  border-radius: 6px;
-  padding: 6px;
-}
-
-.brand-title {
+.ro-p2-charge-card .charge-price .only {
   font-size: 0.52rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 4px;
+  color: var(--white);
 }
 
-.brands-grid {
+.ro-p2-charge-card .charge-sub {
+  font-size: 0.42rem;
+  opacity: 0.9;
+}
+
+.ro-p2-charge-card .charge-note {
+  font-size: 0.38rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.brands-we-service-footer {
+  margin-top: 4px;
+  border-top: 1px dashed var(--border-grey);
+  padding-top: 4px;
+}
+
+.brands-we-service-footer .label {
+  font-size: 0.42rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.brands-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 8px;
+  gap: 2px;
 }
 
-.brands-grid span {
-  font-size: 0.58rem;
+.brands-list span {
+  font-size: 0.45rem;
   font-weight: 600;
+  color: var(--navy-dark);
+  background: var(--white);
+  border: 1px solid var(--border-grey);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.brands-list .and-others {
+  background-color: var(--gold-bg);
+  border-color: rgba(212, 160, 23, 0.2);
   color: var(--navy);
-  background-color: var(--light-grey);
-  padding: 1px 6px;
-  border-radius: 3px;
-  border: 1px solid #E2E8F0;
+  font-weight: 700;
 }
 
-.brands-grid .brands-all {
-  color: var(--white);
-  background-color: var(--gold);
-  border-color: var(--gold-light);
-}
-
-/* Pest Control Specifics */
-.pest-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 8px;
-  align-items: stretch;
-}
-
-.pest-termite-card {
+/* Pest Control Section details */
+.termite-control-box {
   background: var(--white);
   border: 1.5px solid var(--accent-green);
-  border-radius: 8px;
-  padding: 6px 8px;
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin-top: 4px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-between;
+}
+
+.termite-info-column {
+  flex-grow: 1;
 }
 
 .termite-title {
   font-family: 'Outfit', sans-serif;
-  font-size: 0.65rem;
+  font-size: 0.55rem;
   font-weight: 800;
   color: var(--accent-green);
-  text-transform: uppercase;
 }
 
 .termite-rate {
   font-family: 'Outfit', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--navy-dark);
-  line-height: 1;
-  margin: 2px 0;
+  line-height: 1.1;
 }
 
-.termite-rate .unit {
-  font-size: 0.65rem;
+.termite-rate .per-unit {
+  font-size: 0.55rem;
   font-weight: 500;
   color: var(--text-muted);
 }
 
 .termite-bullets {
   list-style: none;
-}
-
-.termite-bullets li {
-  font-size: 0.52rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #334155;
   margin-top: 2px;
 }
 
+.termite-bullets li {
+  font-size: 0.46rem;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
 .termite-bullets li i {
-  width: 10px;
-  height: 10px;
   color: var(--accent-green);
+  width: 9px;
+  height: 9px;
   stroke-width: 3;
 }
 
-/* Water Tank Specifics */
-.tank-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 8px;
-  align-items: center;
-}
-
-.tank-pricing {
-  width: 100%;
-}
-
-.process-wrapper {
-  margin-top: 4px;
-}
-
-.process-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.step-card {
-  background: var(--white);
-  border: 1px solid var(--border-grey);
-  border-radius: 6px;
-  padding: 4px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-}
-
-.step-num {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  font-size: 0.72rem;
-  color: var(--white);
-  background: var(--accent-purple);
-  width: 18px;
-  height: 18px;
+.termite-graphic {
+  background-color: var(--accent-green-bg);
+  color: var(--accent-green);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.step-name {
-  font-size: 0.52rem;
-  font-weight: 700;
-  color: var(--text-dark);
+.termite-graphic i {
+  width: 18px;
+  height: 18px;
 }
 
-/* Why Choose Mildwave Grid */
-.why-choose-grid {
+/* Water Tank Section details */
+.tank-p2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.steps-6-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 4px;
 }
 
-.why-card {
+.step-badge-row {
   background: var(--white);
   border: 1px solid var(--border-grey);
-  border-radius: 6px;
-  padding: 5px;
+  border-radius: 4px;
+  padding: 3px 4px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
-.why-card i {
-  color: var(--gold);
-  width: 16px;
-  height: 16px;
+.step-digit {
+  font-family: 'Outfit', sans-serif;
+  color: var(--white);
+  background-color: var(--accent-purple);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.48rem;
+  font-weight: 800;
   flex-shrink: 0;
 }
 
-.title-star {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2.5;
-  margin-top: 2px;
-}
-
-.why-content h5 {
-  font-size: 0.58rem;
-  font-weight: 700;
-  color: var(--navy-dark);
-  line-height: 1;
-}
-
-.why-content p {
-  font-size: 0.45rem;
-  color: var(--text-muted);
+.step-text {
+  font-size: 0.44rem;
+  color: var(--text-dark);
   line-height: 1.1;
 }
 
-.industries-wrapper {
-  margin-top: 8px;
-}
-
-.industries-grid {
+.suitable-list {
+  list-style: none;
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.industry-tag {
-  font-size: 0.52rem;
-  font-weight: 700;
-  color: var(--navy);
-  background: var(--gold-bg);
-  border: 1px solid rgba(212, 160, 23, 0.25);
-  padding: 2.5px 6px;
-  border-radius: 4px;
+.suitable-list li {
+  font-size: 0.48rem;
+  color: #334155;
   display: flex;
   align-items: center;
   gap: 4px;
+  font-weight: 600;
 }
 
-.industry-tag i {
+.suitable-list li i {
+  color: var(--accent-purple);
   width: 10px;
   height: 10px;
-  color: var(--gold);
+  flex-shrink: 0;
 }
 
 /* Page 2 Footer Specifics */
-.flyer-footer {
+.flyer-footer-p2 {
   background-color: var(--navy-dark);
   border-top: 3px solid var(--gold);
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 8px 12px;
   color: var(--white);
-  margin-top: 8px;
+  margin-top: auto;
 }
 
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px 12px;
+.footer-p2-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.footer-col {
+.footer-contacts {
+  display: flex;
+  gap: 20px;
+  flex-grow: 1;
+}
+
+.contact-item {
   display: flex;
   flex-direction: column;
 }
 
-.footer-col-address {
-  grid-column: span 3;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 4px;
-}
-
-.footer-label {
-  font-size: 0.45rem;
-  text-transform: uppercase;
+.contact-item .label {
+  font-size: 0.42rem;
   color: #94A3B8;
-  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   gap: 3px;
 }
 
-.footer-label i {
-  width: 8px;
-  height: 8px;
+.contact-item .label i {
+  color: var(--gold);
+  width: 9px;
+  height: 9px;
+}
+
+.contact-item .val {
+  font-size: 0.58rem;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+.contact-item .sub {
+  font-size: 0.4rem;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.margin-top-sm {
+  margin-top: 3px;
+}
+
+.footer-badge-pan-india {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 90px;
+}
+
+.map-outline-graphic i {
+  width: 18px;
+  height: 18px;
   color: var(--gold);
 }
 
-.footer-val {
-  font-size: 0.65rem;
-  font-weight: 700;
+.footer-badge-pan-india .badge-text {
+  font-size: 0.42rem;
+  line-height: 1.1;
   color: var(--white);
 }
-
-.footer-col-address .footer-val {
-  font-size: 0.6rem;
-  font-weight: 500;
-  color: #E2E8F0;
-}
-
 
 /* ==========================================
    PRINT MEDIA QUERY STYLES (A4 COMPLIANCE)
    ========================================== */
 @media print {
-  /* Suppress browser default page margins and set layout */
   @page {
     size: A4 portrait;
     margin: 0;
   }
   
-  /* Reset background rendering for print */
   body, html {
     background-color: var(--white) !important;
     padding: 0 !important;
@@ -892,12 +1107,10 @@ h1, h2, h3, h4, h5, h6 {
     print-color-adjust: exact !important;
   }
   
-  /* Hide preview/interactive bar */
   .preview-controls {
     display: none !important;
   }
   
-  /* Page structure setup */
   .flyer-container {
     margin: 0 !important;
     padding: 0 !important;
@@ -908,7 +1121,7 @@ h1, h2, h3, h4, h5, h6 {
   .page {
     width: 210mm !important;
     height: 297mm !important;
-    padding: 10mm 12mm !important;
+    padding: 8mm 10mm !important;
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
@@ -916,14 +1129,7 @@ h1, h2, h3, h4, h5, h6 {
     break-after: page !important;
   }
   
-  /* Prevent background image rendering issues */
   .flyer-header {
     background-image: url('assets/office_buildings_header_bg.png') !important;
-  }
-  
-  /* Allow interactive/clickable elements to show normal print colors */
-  a {
-    text-decoration: none;
-    color: inherit;
   }
 }
