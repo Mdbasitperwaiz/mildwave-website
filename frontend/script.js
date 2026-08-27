@@ -3,7 +3,24 @@ const API_BASE = window.location.hostname === "localhost" || window.location.hos
   ? "http://localhost:5000"
   : "https://mildwave-backend.onrender.com";
 
+const CURRENT_VACANCY = {
+  title: 'ICT Lab Instructor – Phase 2',
+  project: 'Kendriya Bhandar',
+  locations: ['Patna', 'Gaya', 'Jehanabad'],
+  status: 'HIRING NOW',
+  active: true,
+  applicationUrl: '/careers/ict-lab-instructor',
+  jobId: 'm_ict_instructor'
+};
+
+window.openCurrentVacancy = function(event) {
+  event.preventDefault();
+  if (CURRENT_VACANCY.active) window.openApplicationForm(CURRENT_VACANCY.jobId);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  const vacancyAnnouncement = document.getElementById('vacancy-announcement');
+  if (vacancyAnnouncement && !CURRENT_VACANCY.active) vacancyAnnouncement.hidden = true;
   // 1. Initialize Lucide Vector Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
@@ -396,13 +413,13 @@ function toggleButtonLoading(buttonEl, isLoading, originalText) {
 // Helper to format booking payload and redirect to WhatsApp
 function redirectToWhatsApp(payload) {
   const waNumber = "918544071616";
-  const messageText = `*Mildwave RO Booking Request*
+  const messageText = `*Mildwave Service Booking Request*
 ----------------------------------------
 *Customer Name:* ${payload.name}
 *Mobile Number:* ${payload.phone}
 *Email Address:* ${payload.email}
 *City:* ${payload.city} (Pincode: ${payload.pincode})
-*RO Type:* ${payload.type}
+*Property Type:* ${payload.type}
 *Service Required:* ${payload.serviceType}
 *Preferred Date:* ${payload.date}
 *Preferred Slot:* ${payload.time}
@@ -811,6 +828,254 @@ function resetRecruitmentUploadUI(prefix) {
   if (progress) progress.style.display = 'none';
 }
 
+window.resetIctUploadUI = function() {
+  const fields = ['resume', 'photo1', 'photo2', 'marksheet10', 'marksheet12', 'graduation', 'diploma', 'aadhaar', 'pan', 'bank'];
+  fields.forEach(field => {
+    const input = document.getElementById(`ict-file-${field}`);
+    if (input) input.value = '';
+    
+    const zone = document.getElementById(`ict-${field}-dropzone`);
+    if (zone) {
+      zone.classList.remove('selected');
+      zone.style.borderColor = '#cbd5e1';
+    }
+    
+    const title = document.getElementById(`ict-${field}-title`);
+    const meta = document.getElementById(`ict-${field}-meta`);
+    if (title && meta) {
+      let format = 'PDF, JPG, JPEG, or PNG (Max 5MB)';
+      if (field === 'resume') format = 'PDF, DOC, or DOCX (Max 5MB)';
+      if (field === 'photo1' || field === 'photo2') format = 'JPG, JPEG, or PNG (Max 2MB)';
+      
+      let prettyName = field.charAt(0).toUpperCase() + field.slice(1);
+      if (field === 'photo1') prettyName = 'Passport Photo 1';
+      if (field === 'photo2') prettyName = 'Passport Photo 2';
+      if (field === 'marksheet10') prettyName = '10th Marksheet';
+      if (field === 'marksheet12') prettyName = '12th Marksheet';
+      if (field === 'graduation') prettyName = 'Graduation Certificate / Degree';
+      if (field === 'diploma') prettyName = '1-Year Computer Diploma Certificate';
+      if (field === 'aadhaar') prettyName = 'Aadhaar Card';
+      if (field === 'pan') prettyName = 'PAN Card';
+      if (field === 'bank') prettyName = 'Cancelled Cheque / Bank Passbook';
+      
+      title.textContent = `Click or drag & drop ${prettyName} here`;
+      meta.textContent = format;
+    }
+  });
+  
+  const ictForm = document.getElementById('ict-recruitment-form');
+  if (ictForm) {
+    const inputs = ictForm.querySelectorAll('.form-control');
+    inputs.forEach(el => highlightError(el, true));
+  }
+  
+  const progress = document.getElementById('ict-submit-progress');
+  if (progress) progress.style.display = 'none';
+};
+
+window.handleIctFileSelect = function(event, field) {
+  const file = event.target.files[0];
+  if (file) {
+    const title = document.getElementById(`ict-${field}-title`);
+    const meta = document.getElementById(`ict-${field}-meta`);
+    const zone = document.getElementById(`ict-${field}-dropzone`);
+    
+    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
+    if (field === 'resume') allowedExtensions.push('.doc', '.docx');
+    
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowedExtensions.includes(ext)) {
+      showToastNotification(`Invalid file format for ${field}`, "error");
+      event.target.value = '';
+      return;
+    }
+    
+    const maxMB = (field === 'photo1' || field === 'photo2') ? 2 : 5;
+    if (file.size > maxMB * 1024 * 1024) {
+      showToastNotification(`File exceeds the ${maxMB}MB limit`, "error");
+      event.target.value = '';
+      return;
+    }
+    
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    if (title) title.textContent = file.name;
+    if (meta) meta.textContent = `File locked (${sizeMB} MB)`;
+    if (zone) zone.classList.add('selected');
+  }
+};
+
+window.toggleIctSubmitBtn = function() {
+  const confirmCorrect = document.getElementById('ict-confirm-correct');
+  const consentUse = document.getElementById('ict-consent-use');
+  const submitBtn = document.getElementById('ict-submit-btn');
+  if (confirmCorrect && consentUse && submitBtn) {
+    submitBtn.disabled = !(confirmCorrect.checked && consentUse.checked);
+  }
+};
+
+window.handleIctSubmit = function(event) {
+  event.preventDefault();
+  const form = document.getElementById('ict-recruitment-form');
+  if (!form) return;
+  
+  let isValid = true;
+  const reqInputs = ['ict-name', 'ict-parent', 'ict-dob', 'ict-phone', 'ict-whatsapp', 'ict-email', 'ict-address', 'ict-district', 'ict-location', 'ict-edu10', 'ict-edu12', 'ict-edu-grad', 'ict-grad-year', 'ict-diploma', 'ict-diploma-year', 'ict-exp', 'ict-ict-exp'];
+  
+  reqInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.value === '' || (el.tagName === 'INPUT' && el.value.trim().length < 2 && id !== 'ict-exp' && id !== 'ict-ict-exp')) {
+        highlightError(el, false);
+        isValid = false;
+      } else {
+        highlightError(el, true);
+      }
+    }
+  });
+  
+  // Validate file fields
+  const fileFields = ['resume', 'photo1', 'photo2', 'marksheet10', 'marksheet12', 'graduation', 'diploma', 'aadhaar', 'pan', 'bank'];
+  fileFields.forEach(field => {
+    const input = document.getElementById(`ict-file-${field}`);
+    const zone = document.getElementById(`ict-${field}-dropzone`);
+    if (!input || input.files.length === 0) {
+      if (zone) zone.style.borderColor = '#ef4444';
+      isValid = false;
+    } else {
+      if (zone) zone.style.borderColor = '#cbd5e1';
+    }
+  });
+  
+  const confirmCheck = document.getElementById('ict-confirm-correct');
+  const consentCheck = document.getElementById('ict-consent-use');
+  if (!confirmCheck.checked || !consentCheck.checked) {
+    showToastNotification("You must accept all declarations.", "error");
+    isValid = false;
+  }
+  
+  if (!isValid) {
+    showToastNotification("Please review required fields and document uploads.", "error");
+    return;
+  }
+  
+  const submitBtn = document.getElementById('ict-submit-btn');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+  if (submitBtn) toggleButtonLoading(submitBtn, true);
+  
+  const progressContainer = document.getElementById('ict-submit-progress');
+  const progressPercent = document.getElementById('ict-progress-percent');
+  const progressFill = document.getElementById('ict-progress-fill');
+  
+  if (progressContainer) progressContainer.style.display = 'block';
+  
+  const formData = new FormData(form);
+  formData.append('confirmCorrect', confirmCheck.checked);
+  formData.append('consentUse', consentCheck.checked);
+  
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `${API_BASE}/api/careers/ict`, true);
+  
+  xhr.upload.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const progress = Math.round((e.loaded / e.total) * 100);
+      if (progressPercent) progressPercent.textContent = `${progress}%`;
+      if (progressFill) progressFill.style.width = `${progress}%`;
+    }
+  });
+  
+  xhr.addEventListener('load', () => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    
+    if (xhr.status === 200 || xhr.status === 201) {
+      let appId = 'MW-ICT-2026-XXXX';
+      let candidate = {};
+      let whatsappSent = false;
+      try {
+        const res = JSON.parse(xhr.responseText);
+        appId = res.applicationId || appId;
+        candidate = res.candidate || {};
+        whatsappSent = res.whatsappSent === true;
+      } catch (ex) {}
+      
+      showToastNotification("Application submitted successfully!");
+      
+      form.style.display = 'none';
+      const successPanel = document.getElementById('recruitment-success-panel');
+      if (successPanel) {
+        successPanel.style.display = 'block';
+        successPanel.innerHTML = `
+          <div class="success-icon-anim" style="background-color: var(--primary-light); color: var(--primary); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.15); margin: 0 auto 24px;">
+            <i data-lucide="check"></i>
+          </div>
+          <h3 style="font-size: 1.75rem; margin-bottom: 12px;">Application Submitted Successfully!</h3>
+          <p style="color: var(--text-muted); line-height: 1.6; max-width: 500px; margin: 0 auto 16px;">
+            Thank you for applying for the ICT Lab Instructor – Kendriya Bhandar Phase 2 project.
+          </p>
+          <div style="background: var(--light-bg); border: 1px dashed var(--primary); border-radius: var(--radius-sm); padding: 16px; margin: 24px auto; max-width: 320px;">
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 4px;">YOUR UNIQUE APPLICATION ID</span>
+            <strong style="font-size: 1.5rem; color: var(--primary); font-family: monospace;">${appId}</strong>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; max-width: 500px; margin: 0 auto 30px;">
+            Please save your Application ID for future communication. Our recruitment team will review your application and contact you if your profile is shortlisted.
+          </p>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-outline btn-sm" onclick="showJobBoard()">Back to Careers</button>
+            <a href="https://wa.me/918544071616" target="_blank" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;"><i data-lucide="message-square" style="width:14px;height:14px;"></i> Contact Recruitment Team</a>
+          </div>
+        `;
+      }
+      
+      setTimeout(() => {
+        if (progressContainer) progressContainer.style.display = 'none';
+        if (progressPercent) progressPercent.textContent = '0%';
+        if (progressFill) progressFill.style.width = '0%';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }, 500);
+      
+      if (!whatsappSent) window.openWhatsAppIctRedirect(candidate, appId);
+      
+    } else {
+      let errMsg = "Submission failed.";
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (res.error) errMsg = res.error;
+      } catch (ex) {}
+      showToastNotification(errMsg, "error");
+      if (progressContainer) progressContainer.style.display = 'none';
+    }
+  });
+  
+  xhr.addEventListener('error', () => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    showToastNotification("Network error occurred during document uploads.", "error");
+    if (progressContainer) progressContainer.style.display = 'none';
+  });
+  
+  xhr.send(formData);
+};
+
+window.openWhatsAppIctRedirect = function(data, appId) {
+  const dateStr = new Date().toLocaleDateString('en-IN');
+  const msgText = `NEW ICT LAB INSTRUCTOR APPLICATION
+
+Application ID: ${appId}
+Candidate: ${data.name || ''}
+Mobile: ${data.phone || ''}
+Preferred Location: ${data.prefLocation || ''}
+Qualification: ${data.eduGrad || ''} & ${data.compDiploma || ''}
+Computer Diploma: ${data.compDiploma || ''} (Passing Year: ${data.diplomaYear || ''})
+Experience: ${data.totalExp || '0 Years'}
+Application Date: ${dateStr}
+
+Message:
+New candidate application received for the Kendriya Bhandar – ICT Lab Instructor Phase 2 project. Please check the recruitment Gmail for the complete application and uploaded documents.`;
+
+  const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(msgText)}`;
+  setTimeout(() => {
+    window.open(waUrl, '_blank');
+  }, 1000);
+};
+
 // 11. General Contact Form submission validation
 function handleContactSubmit(event) {
   event.preventDefault();
@@ -922,34 +1187,95 @@ function handleModalQuoteSubmit(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-    .then(response => {
-      if (!response.ok) throw new Error("Server error");
-      return response.json();
+    .then(async response => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Server validation failed");
+      }
+      return data;
     })
     .then(data => {
       if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
       document.getElementById('modal-form-container').style.display = 'none';
       document.getElementById('modal-success-panel').style.display = 'block';
-      showToastNotification("Corporate RFQ submitted!");
+      showToastNotification("Corporate RFQ submitted successfully!");
     })
     .catch(error => {
-      console.error("Submission failed:", error);
+      console.warn("Quote API dispatch handled with fallback:", error.message);
       if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      showToastNotification("Something went wrong. Please try again.", "error");
+      
+      showToastNotification("Quote received! Launching WhatsApp for instant confirmation...", "success");
+      document.getElementById('modal-form-container').style.display = 'none';
+      document.getElementById('modal-success-panel').style.display = 'block';
+      
+      const waMsg = `*Mildwave Quote RFQ Request*
+----------------------------------------
+*Customer Name:* ${payload.name}
+*Mobile Number:* ${payload.phone}
+*Email Address:* ${payload.email}
+*Service Vertical:* ${payload.service}
+*Requirement Details:* ${payload.message}`;
+      const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(waMsg)}`;
+      window.open(waUrl, '_blank');
     });
   } else {
-    showToastNotification("Please fill in required RFQ details.", "error");
+    showToastNotification("Please fill in required RFQ details correctly.", "error");
   }
 }
 
-function resetModalQuoteForm() {
-  document.getElementById('modal-quote-form').reset();
-  document.getElementById('modal-form-container').style.display = 'block';
-  document.getElementById('modal-success-panel').style.display = 'none';
-  
-  const inputs = document.querySelectorAll('#modal-quote-form .form-control');
-  inputs.forEach(el => highlightError(el, true));
-}
+window.selectAMCPlan = function(planTitle) {
+  const roTypeInput = document.getElementById('ro-type');
+  const serviceTypeInput = document.getElementById('ro-service-type');
+  const messageInput = document.getElementById('ro-message');
+
+  // Detect which type of service and pre-fill property type sensibly
+  if (roTypeInput) roTypeInput.value = 'Domestic / Home';
+
+  // Map plan title to matching service dropdown value
+  const serviceMap = {
+    'Pest Control': 'Pest Control Inspection',
+    'Water Tank Cleaning': 'Water Tank Cleaning',
+    'Pipeline Cleaning': 'Pipeline Cleaning & Unclogging',
+    'Pipeline Cleaning & Unclogging': 'Pipeline Cleaning & Unclogging',
+  };
+  let serviceValue = 'AMC';
+  for (const [key, val] of Object.entries(serviceMap)) {
+    if (planTitle.includes(key)) {
+      serviceValue = val;
+      break;
+    }
+  }
+  if (serviceTypeInput) serviceTypeInput.value = serviceValue;
+  if (messageInput) messageInput.value = `Booking: ${planTitle}`;
+
+  const bookingSec = document.getElementById('ro-booking');
+  if (bookingSec) {
+    bookingSec.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    toggleQuoteModal(true);
+    const modalService = document.getElementById('modal-service');
+    const modalMsg = document.getElementById('modal-message');
+    if (modalService) modalService.value = 'RO AMC';
+    if (modalMsg) modalMsg.value = `Interested in: ${planTitle}`;
+  }
+  showToastNotification(`Selected: ${planTitle}. Please fill in your details.`);
+};
+
+window.selectManpowerStaff = function(roleTitle, price) {
+  toggleQuoteModal(true);
+  const modalService = document.getElementById('modal-service');
+  const modalMsg = document.getElementById('modal-message');
+  if (modalService) modalService.value = 'Housekeeping Manpower';
+  if (modalMsg) modalMsg.value = `Requirement inquiry for ${roleTitle} (Indicative Rate: ₹${price}/month). Please send custom quote.`;
+  showToastNotification(`Selected ${roleTitle}. Fill details to request quote.`);
+};
+
+window.openWhatsAppDirect = function(serviceName, customMsg) {
+  const waNumber = "918544071616";
+  const text = customMsg || `Hi Mildwave Marketing, I am inquiring about ${serviceName} services. Please share pricing and details.`;
+  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, '_blank');
+};
 
 // 13. Interactive WhatsApp Chat drawer features
 const waDrawer = document.getElementById('wa-drawer');
@@ -1191,7 +1517,10 @@ function showToastNotification(message, type = "success") {
 
 // 17. SPA View Router Controller
 function handleRoute() {
-  const hash = window.location.hash || '#home';
+  let hash = window.location.hash;
+  if (!hash || hash === '#' || hash === '#careers') {
+    hash = '#home';
+  }
   const sections = document.querySelectorAll('main > section');
   
   sections.forEach(sec => {
@@ -1613,6 +1942,34 @@ const CORPORATE_JOBS = [
 ];
 
 const MANPOWER_JOBS = [
+  {
+    id: 'm_ict_instructor',
+    title: 'ICT Lab Instructor – Phase 2',
+    category: 'Manpower & Staff',
+    location: 'Patna | Gaya | Jehanabad, Bihar',
+    client: 'Kendriya Bhandar',
+    employment: 'Project-Based / Manpower Deployment',
+    status: 'Hiring Now',
+    salary: '',
+    experience: '',
+    description: 'Mildwave is currently providing ICT Lab Instructor manpower services for the Kendriya Bhandar Phase 2 project across Patna, Gaya and Jehanabad, Bihar.',
+    details: {
+      about: 'We are inviting applications from eligible candidates for the position of ICT Lab Instructor under the Kendriya Bhandar Phase 2 project. Selected candidates may be deployed at designated locations in Patna, Gaya and Jehanabad, Bihar.',
+      responsibilities: [
+        'Conduct ICT/computer lab sessions.',
+        'Assist students and teachers with computer and digital-learning activities.',
+        'Provide basic technical support during lab sessions.',
+        'Maintain ICT lab equipment and ensure proper functioning.',
+        'Maintain required records and reports.',
+        'Support day-to-day ICT lab operations.',
+        'Follow project and organizational instructions.'
+      ],
+      requirements: [
+        'Documents required: Resume, two photographs, marksheets, graduation certificate/degree, computer diploma certificate, Aadhaar, PAN, and bank passbook/cancelled cheque.',
+        'Original Affidavit to be produced during physical document verification/joining as required.'
+      ]
+    }
+  },
   { id: 'm_hk', title: 'Housekeeping Staff', category: 'Housekeeping', location: 'Patna, Bihar', salary: 'Salary will be discussed during the interview.', experience: '0-1 Year', description: 'Keep corporate offices, commercial malls, or residential spaces clean, tidy, and hygienic daily.' },
   { id: 'm_guard', title: 'Security Guard', category: 'Security', location: 'Patna, Bihar', salary: 'Salary will be discussed during the interview.', experience: '1+ Year', description: 'Guard gates, check visitor logs, monitor CCTV security feeds, and protect corporate facilities.' },
   { id: 'm_office_boy', title: 'Office Boy', category: 'Support', location: 'Patna, Bihar', salary: 'Salary will be discussed during the interview.', experience: 'Fresher', description: 'Ensure desk cleanings, serve tea/coffee, run department files, carry letters, and support general staff.',
@@ -1723,6 +2080,7 @@ function renderActivePortalJobs() {
     
     const catClass = activeCareerPortal === 'corporate' ? 'category-corp' : 'category-manpower';
     const experienceBadge = job.experience ? `<span><i data-lucide="award"></i> ${job.experience}</span>` : '';
+    const jobFacts = [job.client, job.employment, job.status].filter(Boolean).map(fact => `<span><i data-lucide="briefcase"></i> ${escapeHTML(fact)}</span>`).join('');
     
     const hasDetails = !!job.details;
     const applyButton = `<button class="btn btn-primary btn-sm" onclick="window.openApplicationForm('${job.id}')">Apply Now</button>`;
@@ -1740,8 +2098,9 @@ function renderActivePortalJobs() {
         <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">${escapeHTML(job.title)}</h3>
         <div class="job-meta-row">
           <span><i data-lucide="map-pin"></i> ${job.location}</span>
-          <span><i data-lucide="indian-rupee"></i> ${job.salary}</span>
+          ${job.salary ? `<span><i data-lucide="indian-rupee"></i> ${escapeHTML(job.salary)}</span>` : ''}
           ${experienceBadge}
+          ${jobFacts}
         </div>
         <p>${escapeHTML(job.description)}</p>
       </div>
@@ -1781,31 +2140,53 @@ window.openApplicationForm = function(jobId) {
   document.getElementById('application-form-view').style.display = 'block';
   
   const isManpower = isManpowerRole(job.title);
+  const isIct = jobId === 'm_ict_instructor';
+  
   const badge = document.getElementById('form-job-badge');
-  badge.textContent = isManpower ? 'Manpower Division' : 'Professional Division';
-  badge.className = `job-category-pill ${isManpower ? 'category-manpower' : 'category-corp'}`;
+  if (isIct) {
+    badge.textContent = 'Manpower Division';
+    badge.className = 'job-category-pill category-manpower';
+  } else {
+    badge.textContent = isManpower ? 'Manpower Division' : 'Professional Division';
+    badge.className = `job-category-pill ${isManpower ? 'category-manpower' : 'category-corp'}`;
+  }
   
   document.getElementById('form-job-title').textContent = job.title;
-  document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}`;
+  const jobMeta = [job.location, job.client, job.employment, job.status].filter(Boolean).join(' | ');
+  document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${escapeHTML(jobMeta)}`;
   
   const corpForm = document.getElementById('corporate-recruitment-form');
   const manForm = document.getElementById('manpower-recruitment-form');
+  const ictForm = document.getElementById('ict-recruitment-form');
   const successPanel = document.getElementById('recruitment-success-panel');
   
-  corpForm.style.display = 'none';
-  manForm.style.display = 'none';
-  successPanel.style.display = 'none';
+  if (corpForm) corpForm.style.display = 'none';
+  if (manForm) manForm.style.display = 'none';
+  if (ictForm) ictForm.style.display = 'none';
+  if (successPanel) successPanel.style.display = 'none';
   
-  if (!isManpower) {
-    corpForm.style.display = 'block';
-    corpForm.reset();
-    document.getElementById('corp-hidden-position').value = job.title;
-    resetRecruitmentUploadUI('corp');
+  if (isIct) {
+    if (ictForm) {
+      ictForm.style.display = 'block';
+      ictForm.reset();
+      resetIctUploadUI();
+      const subBtn = ictForm.querySelector('button[type="submit"]');
+      if (subBtn) subBtn.disabled = true;
+    }
+  } else if (!isManpower) {
+    if (corpForm) {
+      corpForm.style.display = 'block';
+      corpForm.reset();
+      document.getElementById('corp-hidden-position').value = job.title;
+      resetRecruitmentUploadUI('corp');
+    }
   } else {
-    manForm.style.display = 'block';
-    manForm.reset();
-    document.getElementById('man-hidden-position').value = job.title;
-    resetRecruitmentUploadUI('man');
+    if (manForm) {
+      manForm.style.display = 'block';
+      manForm.reset();
+      document.getElementById('man-hidden-position').value = job.title;
+      resetRecruitmentUploadUI('man');
+    }
   }
   
   const formHeader = document.getElementById('application-form-view');
@@ -1833,6 +2214,7 @@ window.showJobDetails = function(jobId) {
   
   const respList = job.details.responsibilities.map(r => `<li>${escapeHTML(r)}</li>`).join('');
   const reqList = job.details.requirements.map(r => `<li>${escapeHTML(r)}</li>`).join('');
+  const about = job.details.about ? `<h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">About the Role</h4><p style="color: var(--text-muted); line-height: 1.6;">${escapeHTML(job.details.about)}</p>` : '';
   
   body.innerHTML = `
     <span class="job-category-pill category-manpower" style="margin-bottom: 12px; display: inline-block;">${job.category}</span>
@@ -1840,7 +2222,8 @@ window.showJobDetails = function(jobId) {
     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}</p>
     
     <div style="border-top: 1px solid var(--border-light); padding-top: 20px;">
-      <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Job Responsibilities:</h4>
+      ${about}
+      <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Key Responsibilities</h4>
       <ul>${respList}</ul>
       
       <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Candidate Requirements:</h4>
