@@ -102,11 +102,40 @@ if (!fs.existsSync(SECURE_UPLOADS_DIR)) {
 }
 
 const getDbPath = (filename) => path.join(DB_DIR, filename);
+const MASTER_SHEET_PATH = path.join(DB_DIR, 'master_applications.csv');
 
 const initializeJsonDb = (filename, defaultData = []) => {
   const filePath = getDbPath(filename);
   if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf-8');
+  }
+};
+
+const ensureMasterSheet = () => {
+  const headers = ['Form Type', 'Name', 'Mobile No', 'Address', 'Aadhaar Number', 'Job Title', 'Email', 'Applied At'];
+  if (!fs.existsSync(MASTER_SHEET_PATH)) {
+    fs.writeFileSync(MASTER_SHEET_PATH, headers.map(escapeCSV).join(',') + '\n', 'utf-8');
+  }
+};
+
+const appendMasterSheetRow = (record) => {
+  try {
+    ensureMasterSheet();
+    const row = [
+      record.formType || '',
+      record.name || '',
+      record.phone || '',
+      record.address || '',
+      record.aadhaarNumber || '',
+      record.position || record.jobTitle || '',
+      record.email || '',
+      record.appliedAt || new Date().toISOString()
+    ].map(escapeCSV).join(',');
+
+    fs.appendFileSync(MASTER_SHEET_PATH, row + '\n', 'utf-8');
+    console.log(`[MASTER SHEET]: Appended ${record.formType || 'application'} row to ${path.basename(MASTER_SHEET_PATH)}`);
+  } catch (error) {
+    console.error('[MASTER SHEET ERROR]: Failed to append to CSV sheet:', error.message);
   }
 };
 
@@ -119,6 +148,7 @@ initializeJsonDb('candidates.json');
 initializeJsonDb('corporate_applications.json');
 initializeJsonDb('manpower_applications.json');
 initializeJsonDb('ict_applications.json');
+ensureMasterSheet();
 
 // Initialize documents.json with default statutory mockups
 const defaultDocuments = [
@@ -568,6 +598,16 @@ LinkedIn: ${newApp.linkedin}`;
       } catch (mailError) {
         console.error("[SMTP ERROR]: Failed to send corporate application email:", mailError.message);
       }
+      appendMasterSheetRow({
+        formType: 'Corporate Application',
+        name: newApp.name,
+        phone: newApp.phone,
+        address: newApp.address,
+        email: newApp.email,
+        position: newApp.position,
+        appliedAt: newApp.appliedAt
+      });
+
       return res.status(201).json({ success: true, candidate: newApp });
     } else {
       return res.status(500).json({ error: "Internal Database Write Exception" });
@@ -667,6 +707,18 @@ Preferred Work Shift: ${newApp.prefShift}`;
       } catch (mailError) {
         console.error("[SMTP ERROR]: Failed to send manpower application email:", mailError.message);
       }
+
+      appendMasterSheetRow({
+        formType: 'Manpower Application',
+        name: newApp.name,
+        phone: newApp.phone,
+        address: newApp.address,
+        aadhaarNumber: newApp.aadhaarNumber,
+        email: newApp.email,
+        position: newApp.position,
+        appliedAt: newApp.appliedAt
+      });
+
       return res.status(201).json({ success: true, candidate: newApp });
     } else {
       return res.status(500).json({ error: "Internal Database Write Exception" });
@@ -734,6 +786,19 @@ app.get('/api/export/manpower', (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename=manpower_applications.csv');
   res.status(200).send(csv);
+});
+
+// 5e. GET /api/export/master - Download the master applicant ledger as Excel-ready CSV
+app.get('/api/export/master', (req, res) => {
+  ensureMasterSheet();
+  const sheetPath = MASTER_SHEET_PATH;
+  if (fs.existsSync(sheetPath)) {
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=master_applications.csv');
+    res.status(200).send(fs.readFileSync(sheetPath, 'utf-8'));
+  } else {
+    res.status(404).json({ error: 'Master sheet not found' });
+  }
 });
 
 // 6. GET /api/documents - Retrieve all statutory certificates
@@ -952,6 +1017,17 @@ Candidate files are securely attached to this email. You can also view and manag
       const subject = `New ICT Lab Instructor Application – Kendriya Bhandar Phase 2 – ${newApp.name} – ${newApp.prefLocation}`;
       sendNotificationEmail(subject, emailBody, attachments)
         .catch(mailError => console.error("[SMTP ERROR]: Failed to send ICT application email:", mailError.message));
+
+      appendMasterSheetRow({
+        formType: 'ICT Application',
+        name: newApp.name,
+        phone: newApp.phone,
+        address: newApp.address,
+        aadhaarNumber: 'N/A',
+        email: newApp.email,
+        position: 'ICT Lab Instructor',
+        appliedAt: newApp.appliedAt
+      });
 
       let whatsapp = { sent: false, fallback: true };
       try {

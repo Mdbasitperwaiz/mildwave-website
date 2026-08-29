@@ -31,14 +31,12 @@
     }
   </style>
   <script>
-    // Extract the requested path (e.g. /services or /about)
+    // Extract requested path
     const path = window.location.pathname.replace(/^\/|\/$/g, '');
-    
-    // Redirect to the equivalent hash route (e.g. /#services or /#about)
-    if (path && path !== 'index.html') {
+    if (path && path !== 'index.html' && path !== 'careers') {
       window.location.replace('/#' + path);
     } else {
-      window.location.replace('/');
+      window.location.replace('/#home');
     }
   </script>
 </head>
