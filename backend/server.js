@@ -85,6 +85,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '..')));
 
 // Helper to ensure database files exist
 const DB_DIR = path.join(__dirname, 'database');
