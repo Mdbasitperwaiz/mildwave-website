@@ -3,7 +3,24 @@ const API_BASE = window.location.hostname === "localhost" || window.location.hos
   ? "http://localhost:5000"
   : "https://mildwave-backend.onrender.com";
 
+const CURRENT_VACANCY = {
+  title: 'ICT Lab Instructor – Phase 2',
+  project: 'Kendriya Bhandar',
+  locations: ['Patna', 'Gaya', 'Jehanabad'],
+  status: 'HIRING NOW',
+  active: true,
+  applicationUrl: '/careers/ict-lab-instructor',
+  jobId: 'm_ict_instructor'
+};
+
+window.openCurrentVacancy = function(event) {
+  event.preventDefault();
+  if (CURRENT_VACANCY.active) window.openApplicationForm(CURRENT_VACANCY.jobId);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  const vacancyAnnouncement = document.getElementById('vacancy-announcement');
+  if (vacancyAnnouncement && !CURRENT_VACANCY.active) vacancyAnnouncement.hidden = true;
   // 1. Initialize Lucide Vector Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
@@ -396,13 +413,13 @@ function toggleButtonLoading(buttonEl, isLoading, originalText) {
 // Helper to format booking payload and redirect to WhatsApp
 function redirectToWhatsApp(payload) {
   const waNumber = "918544071616";
-  const messageText = `*Mildwave RO Booking Request*
+  const messageText = `*Mildwave Service Booking Request*
 ----------------------------------------
 *Customer Name:* ${payload.name}
 *Mobile Number:* ${payload.phone}
 *Email Address:* ${payload.email}
 *City:* ${payload.city} (Pincode: ${payload.pincode})
-*RO Type:* ${payload.type}
+*Property Type:* ${payload.type}
 *Service Required:* ${payload.serviceType}
 *Preferred Date:* ${payload.date}
 *Preferred Slot:* ${payload.time}
@@ -972,10 +989,12 @@ window.handleIctSubmit = function(event) {
     if (xhr.status === 200 || xhr.status === 201) {
       let appId = 'MW-ICT-2026-XXXX';
       let candidate = {};
+      let whatsappSent = false;
       try {
         const res = JSON.parse(xhr.responseText);
         appId = res.applicationId || appId;
         candidate = res.candidate || {};
+        whatsappSent = res.whatsappSent === true;
       } catch (ex) {}
       
       showToastNotification("Application submitted successfully!");
@@ -1013,7 +1032,7 @@ window.handleIctSubmit = function(event) {
         if (typeof lucide !== 'undefined') lucide.createIcons();
       }, 500);
       
-      window.openWhatsAppIctRedirect(candidate, appId);
+      if (!whatsappSent) window.openWhatsAppIctRedirect(candidate, appId);
       
     } else {
       let errMsg = "Submission failed.";
@@ -1208,11 +1227,27 @@ window.selectAMCPlan = function(planTitle) {
   const roTypeInput = document.getElementById('ro-type');
   const serviceTypeInput = document.getElementById('ro-service-type');
   const messageInput = document.getElementById('ro-message');
-  
-  if (roTypeInput) roTypeInput.value = 'Domestic RO';
-  if (serviceTypeInput) serviceTypeInput.value = 'AMC';
-  if (messageInput) messageInput.value = `Subscribing to: ${planTitle}`;
-  
+
+  // Detect which type of service and pre-fill property type sensibly
+  if (roTypeInput) roTypeInput.value = 'Domestic / Home';
+
+  // Map plan title to matching service dropdown value
+  const serviceMap = {
+    'Pest Control': 'Pest Control Inspection',
+    'Water Tank Cleaning': 'Water Tank Cleaning',
+    'Pipeline Cleaning': 'Pipeline Cleaning & Unclogging',
+    'Pipeline Cleaning & Unclogging': 'Pipeline Cleaning & Unclogging',
+  };
+  let serviceValue = 'AMC';
+  for (const [key, val] of Object.entries(serviceMap)) {
+    if (planTitle.includes(key)) {
+      serviceValue = val;
+      break;
+    }
+  }
+  if (serviceTypeInput) serviceTypeInput.value = serviceValue;
+  if (messageInput) messageInput.value = `Booking: ${planTitle}`;
+
   const bookingSec = document.getElementById('ro-booking');
   if (bookingSec) {
     bookingSec.scrollIntoView({ behavior: 'smooth' });
@@ -1221,9 +1256,9 @@ window.selectAMCPlan = function(planTitle) {
     const modalService = document.getElementById('modal-service');
     const modalMsg = document.getElementById('modal-message');
     if (modalService) modalService.value = 'RO AMC';
-    if (modalMsg) modalMsg.value = `Interested in RO AMC Plan: ${planTitle}`;
+    if (modalMsg) modalMsg.value = `Interested in: ${planTitle}`;
   }
-  showToastNotification(`Selected ${planTitle}. Please complete booking details.`);
+  showToastNotification(`Selected: ${planTitle}. Please fill in your details.`);
 };
 
 window.selectManpowerStaff = function(roleTitle, price) {
@@ -1912,10 +1947,14 @@ const MANPOWER_JOBS = [
     title: 'ICT Lab Instructor – Phase 2',
     category: 'Manpower & Staff',
     location: 'Patna | Gaya | Jehanabad, Bihar',
-    salary: 'Salary will be discussed during the interview.',
-    experience: 'Fresher / Experienced',
+    client: 'Kendriya Bhandar',
+    employment: 'Project-Based / Manpower Deployment',
+    status: 'Hiring Now',
+    salary: '',
+    experience: '',
     description: 'Mildwave is currently providing ICT Lab Instructor manpower services for the Kendriya Bhandar Phase 2 project across Patna, Gaya and Jehanabad, Bihar.',
     details: {
+      about: 'We are inviting applications from eligible candidates for the position of ICT Lab Instructor under the Kendriya Bhandar Phase 2 project. Selected candidates may be deployed at designated locations in Patna, Gaya and Jehanabad, Bihar.',
       responsibilities: [
         'Conduct ICT/computer lab sessions.',
         'Assist students and teachers with computer and digital-learning activities.',
@@ -1926,9 +1965,8 @@ const MANPOWER_JOBS = [
         'Follow project and organizational instructions.'
       ],
       requirements: [
-        'Education: 12th Pass + Graduation + One-Year Computer Diploma.',
-        'Key documents required: Resume, photos, marksheets, computer diploma certificate, Aadhaar, PAN, Bank passbook/cancelled cheque.',
-        'Original Affidavit required at the time of joining/document verification.'
+        'Documents required: Resume, two photographs, marksheets, graduation certificate/degree, computer diploma certificate, Aadhaar, PAN, and bank passbook/cancelled cheque.',
+        'Original Affidavit to be produced during physical document verification/joining as required.'
       ]
     }
   },
@@ -2042,6 +2080,7 @@ function renderActivePortalJobs() {
     
     const catClass = activeCareerPortal === 'corporate' ? 'category-corp' : 'category-manpower';
     const experienceBadge = job.experience ? `<span><i data-lucide="award"></i> ${job.experience}</span>` : '';
+    const jobFacts = [job.client, job.employment, job.status].filter(Boolean).map(fact => `<span><i data-lucide="briefcase"></i> ${escapeHTML(fact)}</span>`).join('');
     
     const hasDetails = !!job.details;
     const applyButton = `<button class="btn btn-primary btn-sm" onclick="window.openApplicationForm('${job.id}')">Apply Now</button>`;
@@ -2059,8 +2098,9 @@ function renderActivePortalJobs() {
         <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">${escapeHTML(job.title)}</h3>
         <div class="job-meta-row">
           <span><i data-lucide="map-pin"></i> ${job.location}</span>
-          <span><i data-lucide="indian-rupee"></i> ${job.salary}</span>
+          ${job.salary ? `<span><i data-lucide="indian-rupee"></i> ${escapeHTML(job.salary)}</span>` : ''}
           ${experienceBadge}
+          ${jobFacts}
         </div>
         <p>${escapeHTML(job.description)}</p>
       </div>
@@ -2112,7 +2152,8 @@ window.openApplicationForm = function(jobId) {
   }
   
   document.getElementById('form-job-title').textContent = job.title;
-  document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}`;
+  const jobMeta = [job.location, job.client, job.employment, job.status].filter(Boolean).join(' | ');
+  document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${escapeHTML(jobMeta)}`;
   
   const corpForm = document.getElementById('corporate-recruitment-form');
   const manForm = document.getElementById('manpower-recruitment-form');
@@ -2173,6 +2214,7 @@ window.showJobDetails = function(jobId) {
   
   const respList = job.details.responsibilities.map(r => `<li>${escapeHTML(r)}</li>`).join('');
   const reqList = job.details.requirements.map(r => `<li>${escapeHTML(r)}</li>`).join('');
+  const about = job.details.about ? `<h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">About the Role</h4><p style="color: var(--text-muted); line-height: 1.6;">${escapeHTML(job.details.about)}</p>` : '';
   
   body.innerHTML = `
     <span class="job-category-pill category-manpower" style="margin-bottom: 12px; display: inline-block;">${job.category}</span>
@@ -2180,7 +2222,8 @@ window.showJobDetails = function(jobId) {
     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;"><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.location} &nbsp;|&nbsp; <i data-lucide="indian-rupee" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${job.salary}</p>
     
     <div style="border-top: 1px solid var(--border-light); padding-top: 20px;">
-      <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Job Responsibilities:</h4>
+      ${about}
+      <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Key Responsibilities</h4>
       <ul>${respList}</ul>
       
       <h4 style="font-size: 1.1rem; color: var(--text-dark); margin-top: 20px; margin-bottom: 10px; font-weight: 700;">Candidate Requirements:</h4>
