@@ -88,7 +88,7 @@
         <span class="vacancy-title">ICT Lab Instructor – Kendriya Bhandar Phase 2</span>
         <span class="vacancy-locations"><i data-lucide="map-pin" aria-hidden="true"></i> Patna • Gaya • Jehanabad</span>
       </div>
-      <a class="btn vacancy-apply" href="#careers" onclick="openCurrentVacancy(event)" aria-label="Apply now for ICT Lab Instructor Phase 2">APPLY NOW <span aria-hidden="true">→</span></a>
+      <a class="btn vacancy-apply" href="https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGIakKGAr40Dv4Tcd8AXv7kP5EmpUZxHwyAma7xmvw/viewform" target="_blank" rel="noopener noreferrer" aria-label="Apply now for ICT Lab Instructor Phase 2">APPLY NOW <span aria-hidden="true">→</span></a>
     </div>
   </div>
 
@@ -545,7 +545,7 @@
             </div>
           </div>
           <div class="banner-actions">
-            <button class="btn btn-primary" onclick="window.openApplicationForm('m_ict_instructor')" style="background-color: var(--accent); border-color: var(--accent);">Apply Now</button>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGIakKGAr40Dv4Tcd8AXv7kP5EmpUZxHwyAma7xmvw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="background-color: var(--accent); border-color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Apply Now</a>
           </div>
         </div>
 
@@ -641,7 +641,7 @@
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 16px; font-size: 0.8rem; color: var(--text-muted);">
                 <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> Patna | Gaya | Jehanabad</span>
-                <button class="btn btn-primary btn-sm" onclick="window.openApplicationForm('m_ict_instructor')" style="padding: 6px 12px; font-size: 0.75rem;">View Project / Apply Now</button>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGIakKGAr40Dv4Tcd8AXv7kP5EmpUZxHwyAma7xmvw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="padding: 6px 12px; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Project / Apply Now</a>
               </div>
             </div>
           </article>
@@ -719,7 +719,7 @@
                 <span><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle;"></i> Patna | Gaya | Jehanabad, Bihar</span>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="window.openApplicationForm('m_ict_instructor')" style="align-self: flex-start;">View Project / Apply Now</button>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGIakKGAr40Dv4Tcd8AXv7kP5EmpUZxHwyAma7xmvw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="align-self: flex-start; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">View Project / Apply Now</a>
           </article>
         </div>
       </div>
@@ -1368,7 +1368,11 @@
                 </div>
                 <div class="form-group">
                   <label for="ict-parent">Father's / Mother's Name *</label>
-                  <input type="text" id="ict-parent" name="parentName" class="form-control" placeholder="Enter parent's name" required>
+                  <input type="text" id="ict-parent" name="parentName" class="form-control" placeholder="Enter father's / parent's name" required>
+                </div>
+                <div class="form-group">
+                  <label for="ict-aadhaar-num">Aadhaar Card Number *</label>
+                  <input type="text" id="ict-aadhaar-num" name="aadhaarNumber" class="form-control" placeholder="12-digit Aadhaar number" required maxLength="12" pattern="\d{12}">
                 </div>
                 <div class="form-group">
                   <label for="ict-dob">Date of Birth *</label>
@@ -1386,15 +1390,15 @@
                   <label for="ict-email">Email Address *</label>
                   <input type="email" id="ict-email" name="email" class="form-control" placeholder="candidate@email.com" required>
                 </div>
+                <div class="form-group">
+                  <label for="ict-district">District / City *</label>
+                  <input type="text" id="ict-district" name="district" class="form-control" placeholder="Enter district / city" required>
+                </div>
                 <div class="form-group full-width">
-                  <label for="ict-address">Complete Address *</label>
-                  <input type="text" id="ict-address" name="address" class="form-control" placeholder="House/Flat No, Street, Landmark, Village, Post Office" required>
+                  <label for="ict-address">Complete Address (Place) *</label>
+                  <input type="text" id="ict-address" name="address" class="form-control" placeholder="House/Flat No, Street, Landmark, Village, Post Office, PIN" required>
                 </div>
-                <div class="form-group">
-                  <label for="ict-district">District *</label>
-                  <input type="text" id="ict-district" name="district" class="form-control" placeholder="Enter district" required>
-                </div>
-                <div class="form-group">
+                <div class="form-group full-width">
                   <label for="ict-location">Preferred Location *</label>
                   <select id="ict-location" name="prefLocation" class="form-control" required>
                     <option value="" disabled selected>Select Preferred Location</option>
@@ -1625,22 +1629,29 @@
             <!-- FORM 1: CORPORATE RECRUITMENT FORM -->
             <form id="corporate-recruitment-form" onsubmit="handleRecruitmentSubmit(event, 'corporate')" novalidate style="display: none;">
               <div class="form-grid">
-                <!-- Personal Info -->
                 <div class="form-group">
                   <label for="corp-name">Full Name *</label>
-                  <input type="text" id="corp-name" name="name" class="form-control" placeholder="Enter first & last name" required>
+                  <input type="text" id="corp-name" name="name" class="form-control" placeholder="Enter full name" required>
+                </div>
+                <div class="form-group">
+                  <label for="corp-father-name">Father's Name *</label>
+                  <input type="text" id="corp-father-name" name="fatherName" class="form-control" placeholder="Enter father's name" required>
+                </div>
+                <div class="form-group">
+                  <label for="corp-aadhaar-num">Aadhaar Card Number *</label>
+                  <input type="text" id="corp-aadhaar-num" name="aadhaarNumber" class="form-control" placeholder="12-digit Aadhaar number" required maxLength="12" pattern="\d{12}">
                 </div>
                 <div class="form-group">
                   <label for="corp-phone">Mobile Number *</label>
-                  <input type="tel" id="corp-phone" name="phone" class="form-control" placeholder="10-digit number" required>
+                  <input type="tel" id="corp-phone" name="phone" class="form-control" placeholder="10-digit mobile number" required>
                 </div>
                 <div class="form-group">
                   <label for="corp-email">Email Address *</label>
                   <input type="email" id="corp-email" name="email" class="form-control" placeholder="name@email.com" required>
                 </div>
                 <div class="form-group">
-                  <label for="corp-address">Address *</label>
-                  <input type="text" id="corp-address" name="address" class="form-control" placeholder="Enter complete address" required>
+                  <label for="corp-address">Place / City / Address *</label>
+                  <input type="text" id="corp-address" name="address" class="form-control" placeholder="Enter city, place, and address" required>
                 </div>
 
                 <!-- Career Credentials -->
@@ -1732,16 +1743,20 @@
                   <input type="text" id="man-name" name="name" class="form-control" placeholder="Enter full name" required>
                 </div>
                 <div class="form-group">
+                  <label for="man-father-name">Father's Name *</label>
+                  <input type="text" id="man-father-name" name="fatherName" class="form-control" placeholder="Enter father's name" required>
+                </div>
+                <div class="form-group">
                   <label for="man-phone">Mobile Number *</label>
-                  <input type="tel" id="man-phone" name="phone" class="form-control" placeholder="10-digit number" required>
+                  <input type="tel" id="man-phone" name="phone" class="form-control" placeholder="10-digit mobile number" required>
                 </div>
                 <div class="form-group">
                   <label for="man-email">Email Address <span style="color: var(--text-muted); font-size: 0.8rem;">(Optional)</span></label>
                   <input type="email" id="man-email" name="email" class="form-control" placeholder="name@email.com">
                 </div>
-                <div class="form-group">
-                  <label for="man-address">Address *</label>
-                  <input type="text" id="man-address" name="address" class="form-control" placeholder="Enter complete address" required>
+                <div class="form-group full-width">
+                  <label for="man-address">Place / City / Address *</label>
+                  <input type="text" id="man-address" name="address" class="form-control" placeholder="Enter complete place & address" required>
                 </div>
 
                 <!-- Job Credentials -->
@@ -1871,16 +1886,35 @@
               <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">Apply for Job</button>
             </form>
 
-            <!-- Success Panel (Displays recruitment confirmation) -->
-            <div class="submit-success-panel" id="recruitment-success-panel" style="display: none;">
-              <div class="success-icon-anim" style="background-color: var(--primary-light); color: var(--primary); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.15); margin: 0 auto 24px;">
-                <i data-lucide="check"></i>
+            <!-- Success Panel (Displays recruitment confirmation & direct WhatsApp dispatch) -->
+            <div class="submit-success-panel" id="recruitment-success-panel" style="display: none; text-align: center; padding: 40px 24px; animation: fadeInUp 0.5s ease forwards;">
+              <div class="success-icon-anim" style="background-color: #dcfce7; color: #16a34a; box-shadow: 0 8px 20px rgba(22, 163, 74, 0.18); margin: 0 auto 20px; width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                <i data-lucide="check-circle-2"></i>
               </div>
-              <h3 style="font-size: 1.75rem; margin-bottom: 12px;">Submission Received!</h3>
-              <p style="color: var(--text-muted); line-height: 1.6; max-width: 500px; margin: 0 auto;" id="recruitment-success-message">
-                Thank you for applying to Mildwave Marketing Pvt. Ltd. Your application has been received successfully. Our HR team will review your profile and contact you if you are shortlisted.
+              <h3 style="font-size: 1.85rem; margin-bottom: 8px; color: var(--text-dark); font-weight: 800;">Application Submitted!</h3>
+              <p style="color: var(--text-muted); line-height: 1.6; max-width: 540px; margin: 0 auto 20px; font-size: 0.95rem;" id="recruitment-success-message">
+                Your application and documents have been logged successfully into our master records.
               </p>
-              <button class="btn btn-outline btn-sm" style="margin-top: 30px;" onclick="showJobBoard()">Apply for Another Position</button>
+
+              <!-- Application summary card with required Excel fields -->
+              <div id="recruitment-summary-card" style="background: var(--light-bg); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 20px; max-width: 480px; margin: 0 auto 24px; text-align: left;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Applicant Overview</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.88rem;">
+                  <div><strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">NAME</strong> <span id="summary-cand-name" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+                  <div><strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">FATHER'S NAME</strong> <span id="summary-cand-father" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+                  <div><strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">AADHAAR CARD NO</strong> <span id="summary-cand-aadhaar" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+                  <div><strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">MOBILE NO</strong> <span id="summary-cand-mobile" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+                  <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted); font-size: 0.8rem; display: block;">PLACE / ADDRESS</strong> <span id="summary-cand-place" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+                </div>
+              </div>
+
+              <!-- Direct WhatsApp Instant Action -->
+              <div style="display: flex; flex-direction: column; gap: 12px; max-width: 480px; margin: 0 auto;">
+                <a href="#" id="recruitment-whatsapp-direct-btn" target="_blank" class="btn btn-primary" style="background-color: #25d366; border-color: #25d366; font-size: 1rem; padding: 14px 24px; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);">
+                  <i data-lucide="message-square" style="width: 20px; height: 20px;"></i> Send Details &amp; Documents on WhatsApp
+                </a>
+                <button class="btn btn-outline btn-sm" onclick="showJobBoard()" style="padding: 10px 18px;">Back to Careers Board</button>
+              </div>
             </div>
 
           </div>
@@ -2374,6 +2408,6 @@
   </div>
 
   <!-- Javascript Scripts -->
-  <script src="script.min.js?v=16" defer></script>
+  <script src="script.min.js?v=35" defer></script>
 </body>
 </html>

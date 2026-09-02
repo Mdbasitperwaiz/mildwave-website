@@ -1,7 +1,19 @@
 // Mildwave Marketing PVT.LTD - Interactive Client Controller
-const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:5000"
-  : "https://mildwave-backend.onrender.com";
+const API_BASE = (() => {
+  if (typeof window === 'undefined') return '';
+  if (window.location.protocol === 'file:') return 'http://localhost:5000';
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return window.location.port === '5000' ? '' : 'http://localhost:5000';
+  }
+  return '';
+})();
+
+// =========================================================================
+// GOOGLE APPLICATION FORM CONFIGURATION
+// Active Google Form for candidate applications
+// =========================================================================
+const GOOGLE_CAREERS_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGIakKGAr40Dv4Tcd8AXv7kP5EmpUZxHwyAma7xmvw/viewform";
+const GOOGLE_ICT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGIakKGAr40Dv4Tcd8AXv7kP5EmpUZxHwyAma7xmvw/viewform";
 
 const CURRENT_VACANCY = {
   title: 'ICT Lab Instructor – Phase 2',
@@ -9,13 +21,13 @@ const CURRENT_VACANCY = {
   locations: ['Patna', 'Gaya', 'Jehanabad'],
   status: 'HIRING NOW',
   active: true,
-  applicationUrl: '/careers/ict-lab-instructor',
+  applicationUrl: GOOGLE_ICT_FORM_URL,
   jobId: 'm_ict_instructor'
 };
 
 window.openCurrentVacancy = function(event) {
-  event.preventDefault();
-  if (CURRENT_VACANCY.active) window.openApplicationForm(CURRENT_VACANCY.jobId);
+  if (event && event.preventDefault) event.preventDefault();
+  window.open(GOOGLE_ICT_FORM_URL, '_blank', 'noopener,noreferrer');
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -376,17 +388,30 @@ function scrollToTop() {
 
 // 8. Custom Form Validation Utilities
 function validateEmail(email) {
+  if (!email) return false;
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
+  return regex.test(String(email).trim());
+}
+
+function cleanPhoneNumber(phone) {
+  if (!phone) return '';
+  let cleaned = String(phone).replace(/[\s\-\+\(\)]/g, '');
+  if (cleaned.startsWith('91') && cleaned.length === 12) {
+    cleaned = cleaned.substring(2);
+  } else if (cleaned.startsWith('0') && cleaned.length === 11) {
+    cleaned = cleaned.substring(1);
+  }
+  return cleaned;
 }
 
 function validatePhone(phone) {
-  // Matches Indian 10 digit mobile standards starting with 6, 7, 8 or 9
-  const regex = /^[6-9]\d{9}$/;
-  return regex.test(phone.replace(/[\s\-\+\(\)]/g, ''));
+  if (!phone) return false;
+  const cleaned = cleanPhoneNumber(phone);
+  return /^\d{10}$/.test(cleaned);
 }
 
 function highlightError(element, isValid) {
+  if (!element) return;
   if (isValid) {
     element.style.borderColor = 'var(--border-light)';
     element.style.backgroundColor = 'var(--light-bg)';
@@ -435,6 +460,7 @@ function redirectToWhatsApp(payload) {
 function handleROSubmit(event) {
   event.preventDefault();
   
+  const form = document.getElementById('ro-booking-form');
   const name = document.getElementById('ro-name');
   const phone = document.getElementById('ro-phone');
   const email = document.getElementById('ro-email');
@@ -447,52 +473,87 @@ function handleROSubmit(event) {
   const address = document.getElementById('ro-address');
   const message = document.getElementById('ro-message');
   
-  let isValid = true;
-  
-  // Custom Validation checks
-  if (name.value.trim().length < 2) { highlightError(name, false); isValid = false; } else { highlightError(name, true); }
-  if (!validatePhone(phone.value)) { highlightError(phone, false); isValid = false; } else { highlightError(phone, true); }
-  if (!validateEmail(email.value)) { highlightError(email, false); isValid = false; } else { highlightError(email, true); }
-  if (city.value.trim().length < 2) { highlightError(city, false); isValid = false; } else { highlightError(city, true); }
-  if (pincode.value.trim().length !== 6 || isNaN(pincode.value.trim())) { highlightError(pincode, false); isValid = false; } else { highlightError(pincode, true); }
-  if (type.value === '') { highlightError(type, false); isValid = false; } else { highlightError(type, true); }
-  if (serviceType.value === '') { highlightError(serviceType, false); isValid = false; } else { highlightError(serviceType, true); }
-  if (!date.value) { highlightError(date, false); isValid = false; } else { highlightError(date, true); }
-  if (time.value === '') { highlightError(time, false); isValid = false; } else { highlightError(time, true); }
-  if (address.value.trim().length < 5) { highlightError(address, false); isValid = false; } else { highlightError(address, true); }
-  
-  if (isValid) {
-    const payload = {
-      name: name.value.trim(),
-      phone: phone.value.trim(),
-      email: email.value.trim(),
-      city: city.value.trim(),
-      pincode: pincode.value.trim(),
-      type: type.value,
-      serviceType: serviceType.value,
-      date: date.value,
-      time: time.value,
-      address: address.value.trim(),
-      message: message ? message.value.trim() : ''
-    };
+  // Custom Validation checks with specific error messages
+  if (!name.value.trim() || name.value.trim().length < 2) {
+    highlightError(name, false);
+    showToastNotification("Please enter your full name.", "error");
+    name.focus();
+    return;
+  } else { highlightError(name, true); }
 
-    // Asynchronously dispatch database write in background (fire-and-forget)
-    fetch(`${API_BASE}/api/booking`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).catch(err => console.warn("[BACKGROUND POST FAILED]:", err));
+  if (!validatePhone(phone.value)) {
+    highlightError(phone, false);
+    showToastNotification("Please enter a valid 10-digit mobile number.", "error");
+    phone.focus();
+    return;
+  } else { highlightError(phone, true); }
 
-    // Immediately display success panel & redirect to WhatsApp
+  if (email.value.trim() && !validateEmail(email.value)) {
+    highlightError(email, false);
+    showToastNotification("Please enter a valid email address.", "error");
+    email.focus();
+    return;
+  } else { highlightError(email, true); }
+
+  if (!city.value.trim()) {
+    highlightError(city, false);
+    showToastNotification("Please enter your city.", "error");
+    city.focus();
+    return;
+  } else { highlightError(city, true); }
+
+  if (!address.value.trim() || address.value.trim().length < 3) {
+    highlightError(address, false);
+    showToastNotification("Please enter your complete service address.", "error");
+    address.focus();
+    return;
+  } else { highlightError(address, true); }
+
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Book Service & WhatsApp Confirm';
+  if (submitBtn) toggleButtonLoading(submitBtn, true);
+
+  const payload = {
+    name: name.value.trim(),
+    phone: cleanPhoneNumber(phone.value),
+    email: email.value.trim(),
+    city: city.value.trim(),
+    pincode: pincode.value.trim(),
+    type: type.value || 'Domestic / Home',
+    serviceType: serviceType.value || 'RO Repair',
+    date: date.value || new Date().toISOString().split('T')[0],
+    time: time.value || 'Morning (9 AM - 12 PM)',
+    address: address.value.trim(),
+    message: message ? message.value.trim() : ''
+  };
+
+  fetch(`${API_BASE}/api/book-service`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(async (response) => {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to register booking");
+    }
+    return data;
+  })
+  .then((data) => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    if (form) form.reset();
     document.getElementById('ro-form-container').style.display = 'none';
     const successPanel = document.getElementById('ro-success-panel');
-    successPanel.style.display = 'block';
+    if (successPanel) successPanel.style.display = 'block';
     
-    showToastNotification("Booking registered. Transferring to WhatsApp...");
-    redirectToWhatsApp(payload);
-  } else {
-    showToastNotification("Please fill all required fields correctly.", "error");
-  }
+    showToastNotification("Booking registered successfully! Transferring to WhatsApp...");
+    setTimeout(() => redirectToWhatsApp(payload), 800);
+  })
+  .catch((err) => {
+    console.error("[RO BOOKING DISPATCH ERROR]:", err);
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    showToastNotification(err.message || "Failed to submit booking.", "error");
+  });
 }
 
 
@@ -569,154 +630,69 @@ window.handleRecruitmentSubmit = function(event, portalType) {
   const prefix = portalType === 'corporate' ? 'corp' : 'man';
   const form = event.target;
   
-  const inputs = form.querySelectorAll('.form-control[required]');
-  let isValid = true;
-  
-  inputs.forEach(input => {
-    if (input.value.trim() === '') {
-      highlightError(input, false);
-      isValid = false;
-    } else {
-      highlightError(input, true);
-    }
-  });
-  
-  const phone = document.getElementById(`${prefix}-phone`);
-  if (phone && !validatePhone(phone.value)) {
-    highlightError(phone, false);
-    isValid = false;
-  }
-  
-  const email = document.getElementById(`${prefix}-email`);
-  // Email is optional for manpower, but if filled, it must be valid.
-  if (email && email.value.trim() !== '') {
-    if (!validateEmail(email.value)) {
-      highlightError(email, false);
-      isValid = false;
-    }
-  } else if (email && email.hasAttribute('required')) {
-    if (!validateEmail(email.value)) {
-      highlightError(email, false);
-      isValid = false;
-    }
-  }
-  
-  const address = document.getElementById(`${prefix}-address`);
-  if (address && address.value.trim().length < 5) {
-    highlightError(address, false);
-    isValid = false;
-  }
-  
+  const name = form.querySelector('[name="name"]') ? form.querySelector('[name="name"]').value.trim() : '';
+  const fatherName = form.querySelector('[name="fatherName"]') ? form.querySelector('[name="fatherName"]').value.trim() : '';
+  const aadhaarNumber = form.querySelector('[name="aadhaarNumber"]') ? form.querySelector('[name="aadhaarNumber"]').value.trim() : '';
+  const phone = form.querySelector('[name="phone"]') ? form.querySelector('[name="phone"]').value.trim() : '';
+  const address = form.querySelector('[name="address"]') ? form.querySelector('[name="address"]').value.trim() : '';
+  const position = form.querySelector('[name="position"]') ? form.querySelector('[name="position"]').value.trim() : '';
+  const email = form.querySelector('[name="email"]') ? form.querySelector('[name="email"]').value.trim() : '';
+
+  const nameInput = form.querySelector('[name="name"]');
+  const phoneInput = form.querySelector('[name="phone"]');
+  const addrInput = form.querySelector('[name="address"]');
+
+  if (!name || name.length < 2) {
+    if (nameInput) { highlightError(nameInput, false); nameInput.focus(); }
+    showToastNotification("Please enter your full name (minimum 2 characters).", "error");
+    return;
+  } else if (nameInput) { highlightError(nameInput, true); }
+
+  if (!validatePhone(phone)) {
+    if (phoneInput) { highlightError(phoneInput, false); phoneInput.focus(); }
+    showToastNotification("Please enter a valid 10-digit mobile number.", "error");
+    return;
+  } else if (phoneInput) { highlightError(phoneInput, true); }
+
+  if (!address || address.length < 3) {
+    if (addrInput) { highlightError(addrInput, false); addrInput.focus(); }
+    showToastNotification("Please enter your place / city / address.", "error");
+    return;
+  } else if (addrInput) { highlightError(addrInput, true); }
+
   if (portalType === 'corporate') {
-    const qualification = document.getElementById('corp-qualification');
-    if (qualification && qualification.value.trim().length < 2) {
-      highlightError(qualification, false);
-      isValid = false;
-    }
-    
-    const experience = document.getElementById('corp-experience');
-    if (experience && experience.value.trim().length < 1) {
-      highlightError(experience, false);
-      isValid = false;
-    }
-
-    const skills = document.getElementById('corp-skills');
-    if (skills && skills.value.trim().length < 2) {
-      highlightError(skills, false);
-      isValid = false;
-    }
-
-    const certifications = document.getElementById('corp-certifications');
-    if (certifications && certifications.value.trim().length < 2) {
-      highlightError(certifications, false);
-      isValid = false;
-    }
-    
     const resumeInput = document.getElementById('corp-file-resume');
     const resumeZone = document.getElementById('corp-resume-dropzone');
     if (!resumeInput || resumeInput.files.length === 0) {
       if (resumeZone) resumeZone.style.borderColor = '#ef4444';
-      isValid = false;
-      showToastNotification("Resume upload is mandatory for professional roles.", "error");
+      showToastNotification("Resume upload is mandatory. Please attach your resume.", "error");
+      return;
     } else {
       if (resumeZone) resumeZone.style.borderColor = '#cbd5e1';
     }
   } else {
-    const aadhaarNum = document.getElementById('man-aadhaar-num');
-    if (aadhaarNum && (aadhaarNum.value.trim().length !== 12 || isNaN(aadhaarNum.value.trim()))) {
-      highlightError(aadhaarNum, false);
-      isValid = false;
+    const cleanAadhaar = (aadhaarNumber || '').replace(/[\s\-]/g, '');
+    if (cleanAadhaar && cleanAadhaar.length !== 12) {
+      const aadhaarInput = document.getElementById('man-aadhaar-num');
+      if (aadhaarInput) { highlightError(aadhaarInput, false); aadhaarInput.focus(); }
       showToastNotification("Aadhaar Card Number must be exactly 12 digits.", "error");
-    }
-
-    const panNum = document.getElementById('man-pan-num');
-    if (panNum && panNum.value.trim() !== '') {
-      if (panNum.value.trim().length !== 10) {
-        highlightError(panNum, false);
-        isValid = false;
-        showToastNotification("PAN Card Number must be exactly 10 characters.", "error");
-      }
-    }
-
-    const education = document.getElementById('man-education');
-    if (education && education.value === '') {
-      highlightError(education, false);
-      isValid = false;
-    }
-
-    const experience = document.getElementById('man-experience');
-    if (experience && experience.value.trim().length < 1) {
-      highlightError(experience, false);
-      isValid = false;
-    }
-
-    const police = document.getElementById('man-police');
-    if (police && police.value === '') {
-      highlightError(police, false);
-      isValid = false;
-    }
-
-    const relocate = document.getElementById('man-relocate');
-    if (relocate && relocate.value === '') {
-      highlightError(relocate, false);
-      isValid = false;
-    }
-
-    const shift = document.getElementById('man-shift');
-    if (shift && shift.value === '') {
-      highlightError(shift, false);
-      isValid = false;
+      return;
     }
 
     const aadhaarInput = document.getElementById('man-file-aadhaar');
     const aadhaarZone = document.getElementById('man-aadhaar-dropzone');
     if (!aadhaarInput || aadhaarInput.files.length === 0) {
       if (aadhaarZone) aadhaarZone.style.borderColor = '#ef4444';
-      isValid = false;
-      showToastNotification("Aadhaar Card upload is mandatory.", "error");
+      showToastNotification("Aadhaar Card document upload is mandatory.", "error");
+      return;
     } else {
       if (aadhaarZone) aadhaarZone.style.borderColor = '#cbd5e1';
-    }
-
-    const photoInput = document.getElementById('man-file-photo');
-    const photoZone = document.getElementById('man-photo-dropzone');
-    if (!photoInput || photoInput.files.length === 0) {
-      if (photoZone) photoZone.style.borderColor = '#ef4444';
-      isValid = false;
-      showToastNotification("Passport photograph is mandatory.", "error");
-    } else {
-      if (photoZone) photoZone.style.borderColor = '#cbd5e1';
     }
   }
   
   const recaptchaCheck = document.getElementById(`${prefix}-recaptcha-check`);
   if (recaptchaCheck && !recaptchaCheck.checked) {
-    isValid = false;
-    showToastNotification("Please complete the reCAPTCHA verification.", "error");
-  }
-  
-  if (!isValid) {
-    showToastNotification("Please check all required fields.", "error");
+    showToastNotification("Please check the 'I am not a robot' verification box.", "error");
     return;
   }
   
@@ -746,44 +722,76 @@ window.handleRecruitmentSubmit = function(event, portalType) {
     if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
     
     if (xhr.status === 200 || xhr.status === 201) {
+      let resData = {};
+      try { resData = JSON.parse(xhr.responseText); } catch (e) {}
+
       showToastNotification("Application submitted successfully!");
+      form.reset();
+      resetRecruitmentUploadUI(prefix);
       
       form.style.display = 'none';
       const successPanel = document.getElementById('recruitment-success-panel');
       if (successPanel) successPanel.style.display = 'block';
       
-      const successMsg = document.getElementById('recruitment-success-message');
-      if (successMsg) {
-        successMsg.textContent = "Thank you for applying to Mildwave Marketing Pvt. Ltd. Your application has been received successfully. Our HR team will review your profile and contact you if you are shortlisted.";
-      }
-      
+      // Update Summary Card
+      const sName = document.getElementById('summary-cand-name');
+      const sFather = document.getElementById('summary-cand-father');
+      const sAadhaar = document.getElementById('summary-cand-aadhaar');
+      const sMobile = document.getElementById('summary-cand-mobile');
+      const sPlace = document.getElementById('summary-cand-place');
+
+      if (sName) sName.textContent = name || '-';
+      if (sFather) sFather.textContent = fatherName || '-';
+      if (sAadhaar) sAadhaar.textContent = aadhaarNumber || 'Attached';
+      if (sMobile) sMobile.textContent = phone || '-';
+      if (sPlace) sPlace.textContent = address || '-';
+
+      const docLink = resData.docLink || '';
+      const waMsg = resData.whatsappMsg || `*MILDWAVE MARKETING - JOB APPLICATION*
+----------------------------------------
+*Name:* ${name}
+*Father Name:* ${fatherName || 'N/A'}
+*Aadhaar Card No:* ${aadhaarNumber || 'N/A'}
+*Mobile No:* ${phone}
+*Place:* ${address}
+*Position:* ${position}
+*Document Link:* ${docLink || 'Document attached'}
+----------------------------------------`;
+
+      const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(waMsg)}`;
+      const waBtn = document.getElementById('recruitment-whatsapp-direct-btn');
+      if (waBtn) waBtn.href = waUrl;
+
       setTimeout(() => {
         if (progressContainer) progressContainer.style.display = 'none';
         if (progressPercent) progressPercent.textContent = '0%';
         if (progressFill) progressFill.style.width = '0%';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
       }, 500);
+
+      // Automatically launch WhatsApp
+      setTimeout(() => {
+        window.open(waUrl, '_blank');
+      }, 1000);
+
     } else {
       let errMsg = "Submission failed.";
       try {
         const res = JSON.parse(xhr.responseText);
         if (res.error) errMsg = res.error;
       } catch (ex) {}
-      showToastNotification(errMsg + " Redirecting to fallback submission...", "error");
       
-      setTimeout(() => {
-        if (progressContainer) progressContainer.style.display = 'none';
-        window.showRecruitmentFallbackModal(portalType, form);
-      }, 1000);
+      console.error("[RECRUITMENT UPLOAD ERROR]:", errMsg);
+      showToastNotification(errMsg, "error");
+      if (progressContainer) progressContainer.style.display = 'none';
     }
   });
   
-  xhr.addEventListener('error', () => {
+  xhr.addEventListener('error', (e) => {
+    console.error("[RECRUITMENT NETWORK ERROR]:", e);
     if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-    showToastNotification("Network error occurred. Redirecting to fallback submission...", "error");
-    setTimeout(() => {
-      if (progressContainer) progressContainer.style.display = 'none';
-      window.showRecruitmentFallbackModal(portalType, form);
-    }, 1000);
+    showToastNotification("Network connection error. Please check your connection.", "error");
+    if (progressContainer) progressContainer.style.display = 'none';
   });
   
   xhr.send(formData);
@@ -998,6 +1006,8 @@ window.handleIctSubmit = function(event) {
       } catch (ex) {}
       
       showToastNotification("Application submitted successfully!");
+      form.reset();
+      if (typeof window.resetIctUploadUI === 'function') window.resetIctUploadUI();
       
       form.style.display = 'none';
       const successPanel = document.getElementById('recruitment-success-panel');
@@ -1032,7 +1042,8 @@ window.handleIctSubmit = function(event) {
         if (typeof lucide !== 'undefined') lucide.createIcons();
       }, 500);
       
-      if (!whatsappSent) window.openWhatsAppIctRedirect(candidate, appId);
+      const docLink = res.docLink || '';
+      if (!whatsappSent) window.openWhatsAppIctRedirect(candidate, appId, docLink);
       
     } else {
       let errMsg = "Submission failed.";
@@ -1040,8 +1051,27 @@ window.handleIctSubmit = function(event) {
         const res = JSON.parse(xhr.responseText);
         if (res.error) errMsg = res.error;
       } catch (ex) {}
-      showToastNotification(errMsg, "error");
+      showToastNotification(errMsg + " Opening WhatsApp to send your application...", "info");
       if (progressContainer) progressContainer.style.display = 'none';
+
+      // Fallback: extract fields and open WhatsApp directly
+      const ictName = form.querySelector('[name="name"]') ? form.querySelector('[name="name"]').value : '';
+      const ictParent = form.querySelector('[name="parentName"]') ? form.querySelector('[name="parentName"]').value : '';
+      const ictAadhaar = form.querySelector('[name="aadhaarNumber"]') ? form.querySelector('[name="aadhaarNumber"]').value : '';
+      const ictPhone = form.querySelector('[name="phone"]') ? form.querySelector('[name="phone"]').value : '';
+      const ictAddress = form.querySelector('[name="address"]') ? form.querySelector('[name="address"]').value : '';
+      const ictDist = form.querySelector('[name="district"]') ? form.querySelector('[name="district"]').value : '';
+      const ictLoc = form.querySelector('[name="prefLocation"]') ? form.querySelector('[name="prefLocation"]').value : '';
+
+      window.openWhatsAppIctRedirect({
+        name: ictName,
+        parentName: ictParent,
+        aadhaarNumber: ictAadhaar,
+        phone: ictPhone,
+        address: ictAddress,
+        district: ictDist,
+        prefLocation: ictLoc
+      }, 'MW-ICT-ONLINE', '');
     }
   });
   
@@ -1054,21 +1084,21 @@ window.handleIctSubmit = function(event) {
   xhr.send(formData);
 };
 
-window.openWhatsAppIctRedirect = function(data, appId) {
-  const dateStr = new Date().toLocaleDateString('en-IN');
-  const msgText = `NEW ICT LAB INSTRUCTOR APPLICATION
-
-Application ID: ${appId}
-Candidate: ${data.name || ''}
-Mobile: ${data.phone || ''}
-Preferred Location: ${data.prefLocation || ''}
-Qualification: ${data.eduGrad || ''} & ${data.compDiploma || ''}
-Computer Diploma: ${data.compDiploma || ''} (Passing Year: ${data.diplomaYear || ''})
-Experience: ${data.totalExp || '0 Years'}
-Application Date: ${dateStr}
-
-Message:
-New candidate application received for the Kendriya Bhandar – ICT Lab Instructor Phase 2 project. Please check the recruitment Gmail for the complete application and uploaded documents.`;
+window.openWhatsAppIctRedirect = function(data, appId, docLink) {
+  const msgText = `*NEW ICT LAB INSTRUCTOR APPLICATION*
+----------------------------------------
+*Application ID:* ${appId || 'MW-ICT-2026'}
+*Name:* ${data.name || ''}
+*Father Name:* ${data.parentName || data.fatherName || 'N/A'}
+*Aadhaar Card No:* ${data.aadhaarNumber || 'Uploaded'}
+*Mobile No:* ${data.phone || ''}
+*WhatsApp No:* ${data.whatsapp || data.phone || ''}
+*Place:* ${data.address || ''}, ${data.district || ''} (${data.prefLocation || ''})
+*Preferred Location:* ${data.prefLocation || ''}
+*Qualification:* ${data.eduGrad || ''} & ${data.compDiploma || ''}
+*Document Link:* ${docLink || 'Attached in chat'}
+----------------------------------------
+*Note:* Candidate application and verification documents submitted on the Mildwave Portal.`;
 
   const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(msgText)}`;
   setTimeout(() => {
@@ -1080,53 +1110,76 @@ New candidate application received for the Kendriya Bhandar – ICT Lab Instruct
 function handleContactSubmit(event) {
   event.preventDefault();
   
+  const form = document.getElementById('general-contact-form');
   const name = document.getElementById('contact-name');
   const email = document.getElementById('contact-email');
   const phone = document.getElementById('contact-phone');
   const message = document.getElementById('contact-message');
   
-  let isValid = true;
-  
-  if (name.value.trim().length < 2) { highlightError(name, false); isValid = false; } else { highlightError(name, true); }
-  if (!validateEmail(email.value)) { highlightError(email, false); isValid = false; } else { highlightError(email, true); }
-  if (!validatePhone(phone.value)) { highlightError(phone, false); isValid = false; } else { highlightError(phone, true); }
-  if (message.value.trim().length < 10) { highlightError(message, false); isValid = false; } else { highlightError(message, true); }
-  
-  if (isValid) {
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Send Message';
-    if (submitBtn) toggleButtonLoading(submitBtn, true);
+  if (!name.value.trim() || name.value.trim().length < 2) {
+    highlightError(name, false);
+    showToastNotification("Please enter your full name (minimum 2 characters).", "error");
+    name.focus();
+    return;
+  } else { highlightError(name, true); }
 
-    const payload = {
-      name: name.value.trim(),
-      email: email.value.trim(),
-      phone: phone.value.trim(),
-      message: message.value.trim()
-    };
+  if (!validateEmail(email.value)) {
+    highlightError(email, false);
+    showToastNotification("Please enter a valid email address.", "error");
+    email.focus();
+    return;
+  } else { highlightError(email, true); }
 
-    fetch(`${API_BASE}/api/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    .then(response => {
-      if (!response.ok) throw new Error("Server error");
-      return response.json();
-    })
-    .then(data => {
-      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      document.getElementById('contact-form-container').style.display = 'none';
-      document.getElementById('contact-success-panel').style.display = 'block';
-      showToastNotification("Message sent successfully!");
-    })
-    .catch(error => {
-      console.error("Submission failed:", error);
-      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      showToastNotification("Something went wrong. Please try again.", "error");
-    });
-  } else {
-    showToastNotification("Please fill in all contact details.", "error");
-  }
+  if (!validatePhone(phone.value)) {
+    highlightError(phone, false);
+    showToastNotification("Please enter a valid 10-digit mobile number.", "error");
+    phone.focus();
+    return;
+  } else { highlightError(phone, true); }
+
+  if (!message.value.trim() || message.value.trim().length < 2) {
+    highlightError(message, false);
+    showToastNotification("Please enter your inquiry message.", "error");
+    message.focus();
+    return;
+  } else { highlightError(message, true); }
+  
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Send Message';
+  if (submitBtn) toggleButtonLoading(submitBtn, true);
+
+  const payload = {
+    name: name.value.trim(),
+    email: email.value.trim(),
+    phone: cleanPhoneNumber(phone.value),
+    message: message.value.trim()
+  };
+
+  fetch(`${API_BASE}/api/contact`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(async (response) => {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to send contact inquiry");
+    }
+    return data;
+  })
+  .then((data) => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    if (form) form.reset();
+    document.getElementById('contact-form-container').style.display = 'none';
+    const successPanel = document.getElementById('contact-success-panel');
+    if (successPanel) successPanel.style.display = 'block';
+    showToastNotification("Message sent successfully!");
+  })
+  .catch((error) => {
+    console.error("[CONTACT SUBMIT ERROR]:", error);
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    showToastNotification(error.message || "Failed to send message. Please try again.", "error");
+  });
 }
 
 function resetContactForm() {
@@ -1155,72 +1208,97 @@ function toggleQuoteModal(show) {
 function handleModalQuoteSubmit(event) {
   event.preventDefault();
   
+  const form = document.getElementById('modal-quote-form');
   const name = document.getElementById('modal-name');
   const phone = document.getElementById('modal-phone');
   const email = document.getElementById('modal-email');
   const service = document.getElementById('modal-service');
   const message = document.getElementById('modal-message');
   
-  let isValid = true;
-  
-  if (name.value.trim().length < 2) { highlightError(name, false); isValid = false; } else { highlightError(name, true); }
-  if (!validatePhone(phone.value)) { highlightError(phone, false); isValid = false; } else { highlightError(phone, true); }
-  if (!validateEmail(email.value)) { highlightError(email, false); isValid = false; } else { highlightError(email, true); }
-  if (service.value === '') { highlightError(service, false); isValid = false; } else { highlightError(service, true); }
-  if (message.value.trim().length < 5) { highlightError(message, false); isValid = false; } else { highlightError(message, true); }
-  
-  if (isValid) {
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit RFQ Quote Request';
-    if (submitBtn) toggleButtonLoading(submitBtn, true);
+  if (!name.value.trim() || name.value.trim().length < 2) {
+    highlightError(name, false);
+    showToastNotification("Please enter your name.", "error");
+    name.focus();
+    return;
+  } else { highlightError(name, true); }
 
-    const payload = {
-      name: name.value.trim(),
-      phone: phone.value.trim(),
-      email: email.value.trim(),
-      service: service.value,
-      message: message.value.trim()
-    };
+  if (!validatePhone(phone.value)) {
+    highlightError(phone, false);
+    showToastNotification("Please enter a valid 10-digit mobile number.", "error");
+    phone.focus();
+    return;
+  } else { highlightError(phone, true); }
 
-    fetch(`${API_BASE}/api/quote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    .then(async response => {
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.error || "Server validation failed");
-      }
-      return data;
-    })
-    .then(data => {
-      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      document.getElementById('modal-form-container').style.display = 'none';
-      document.getElementById('modal-success-panel').style.display = 'block';
-      showToastNotification("Corporate RFQ submitted successfully!");
-    })
-    .catch(error => {
-      console.warn("Quote API dispatch handled with fallback:", error.message);
-      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
-      
-      showToastNotification("Quote received! Launching WhatsApp for instant confirmation...", "success");
-      document.getElementById('modal-form-container').style.display = 'none';
-      document.getElementById('modal-success-panel').style.display = 'block';
-      
-      const waMsg = `*Mildwave Quote RFQ Request*
+  if (!validateEmail(email.value)) {
+    highlightError(email, false);
+    showToastNotification("Please enter a valid corporate email.", "error");
+    email.focus();
+    return;
+  } else { highlightError(email, true); }
+
+  if (!service.value) {
+    highlightError(service, false);
+    showToastNotification("Please select a service vertical.", "error");
+    service.focus();
+    return;
+  } else { highlightError(service, true); }
+
+  if (!message.value.trim()) {
+    highlightError(message, false);
+    showToastNotification("Please describe your requirement.", "error");
+    message.focus();
+    return;
+  } else { highlightError(message, true); }
+  
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit RFQ Quote Request';
+  if (submitBtn) toggleButtonLoading(submitBtn, true);
+
+  const payload = {
+    name: name.value.trim(),
+    phone: cleanPhoneNumber(phone.value),
+    email: email.value.trim(),
+    service: service.value,
+    message: message.value.trim()
+  };
+
+  fetch(`${API_BASE}/api/quote`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(async response => {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Server validation failed");
+    }
+    return data;
+  })
+  .then(data => {
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    if (form) form.reset();
+    document.getElementById('modal-form-container').style.display = 'none';
+    document.getElementById('modal-success-panel').style.display = 'block';
+    showToastNotification("Corporate RFQ submitted successfully!");
+  })
+  .catch(error => {
+    console.error("[QUOTE RFQ ERROR]:", error);
+    if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+    
+    showToastNotification("Quote received! Launching WhatsApp for instant confirmation...", "info");
+    document.getElementById('modal-form-container').style.display = 'none';
+    document.getElementById('modal-success-panel').style.display = 'block';
+    
+    const waMsg = `*Mildwave Quote RFQ Request*
 ----------------------------------------
 *Customer Name:* ${payload.name}
 *Mobile Number:* ${payload.phone}
 *Email Address:* ${payload.email}
 *Service Vertical:* ${payload.service}
 *Requirement Details:* ${payload.message}`;
-      const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(waMsg)}`;
-      window.open(waUrl, '_blank');
-    });
-  } else {
-    showToastNotification("Please fill in required RFQ details correctly.", "error");
-  }
+    const waUrl = `https://wa.me/918544071616?text=${encodeURIComponent(waMsg)}`;
+    setTimeout(() => window.open(waUrl, '_blank'), 800);
+  });
 }
 
 window.selectAMCPlan = function(planTitle) {
@@ -1403,27 +1481,35 @@ Copyright (c) 2026 Mildwave Marketing Pvt. Ltd. India. All Rights Reserved.
 // 15. Newsletter Subscription Submission
 function handleNewsletterSubmit(event) {
   event.preventDefault();
-  const input = event.target.querySelector('input');
+  const form = event.target;
+  const input = form.querySelector('input');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : '<i data-lucide="send"></i>';
+
   if (input && validateEmail(input.value)) {
     const payload = { email: input.value.trim() };
+    if (submitBtn) toggleButtonLoading(submitBtn, true);
     
     fetch(`${API_BASE}/api/newsletter`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-    .then(response => {
-      if (!response.ok) throw new Error("Server error");
-      return response.json();
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Subscription failed");
+      return data;
     })
-    .then(data => {
-      showToastNotification("Subscribed to compliance digests successfully!");
-      event.target.reset();
+    .then((data) => {
+      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+      showToastNotification(data.message || "Subscribed to corporate newsletter successfully!");
+      form.reset();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     })
-    .catch(error => {
-      console.warn("Express server offline. Falling back to demo mode.", error);
-      showToastNotification("Subscribed successfully! (Offline Demo Mode)");
-      event.target.reset();
+    .catch((error) => {
+      console.error("[NEWSLETTER SUBMIT ERROR]:", error);
+      if (submitBtn) toggleButtonLoading(submitBtn, false, originalBtnText);
+      showToastNotification(error.message || "Subscription failed. Please try again.", "error");
     });
   } else {
     showToastNotification("Please enter a valid corporate email.", "error");
@@ -1950,6 +2036,7 @@ const MANPOWER_JOBS = [
     client: 'Kendriya Bhandar',
     employment: 'Project-Based / Manpower Deployment',
     status: 'Hiring Now',
+    googleFormUrl: GOOGLE_ICT_FORM_URL,
     salary: '',
     experience: '',
     description: 'Mildwave is currently providing ICT Lab Instructor manpower services for the Kendriya Bhandar Phase 2 project across Patna, Gaya and Jehanabad, Bihar.',
@@ -2133,65 +2220,92 @@ function isManpowerRole(title) {
 }
 
 window.openApplicationForm = function(jobId) {
+  if (jobId === 'm_ict_instructor') {
+    window.open(GOOGLE_ICT_FORM_URL, '_blank', 'noopener,noreferrer');
+    return;
+  }
   const job = [...CORPORATE_JOBS, ...MANPOWER_JOBS].find(j => j.id === jobId);
-  if (!job) return;
+  const jobTitle = job ? job.title : 'Mildwave Career Opportunity';
+  const targetUrl = (job && job.googleFormUrl) ? job.googleFormUrl : GOOGLE_CAREERS_FORM_URL;
   
-  document.getElementById('job-board-view').style.display = 'none';
-  document.getElementById('application-form-view').style.display = 'block';
-  
-  const isManpower = isManpowerRole(job.title);
-  const isIct = jobId === 'm_ict_instructor';
-  
-  const badge = document.getElementById('form-job-badge');
-  if (isIct) {
-    badge.textContent = 'Manpower Division';
-    badge.className = 'job-category-pill category-manpower';
-  } else {
-    badge.textContent = isManpower ? 'Manpower Division' : 'Professional Division';
-    badge.className = `job-category-pill ${isManpower ? 'category-manpower' : 'category-corp'}`;
+  showToastNotification(`Opening application form for "${jobTitle}"...`, "info");
+
+  // Attempt to open the Google Form in a new tab
+  const win = window.open(targetUrl, '_blank', 'noopener,noreferrer');
+
+  // Also display the Google Form redirection assistant in the careers view
+  const jobBoard = document.getElementById('job-board-view');
+  const appView = document.getElementById('application-form-view');
+  if (jobBoard) jobBoard.style.display = 'none';
+  if (appView) {
+    appView.style.display = 'block';
+    
+    const formTitle = document.getElementById('form-job-title');
+    if (formTitle) formTitle.textContent = jobTitle;
+    
+    const badge = document.getElementById('form-job-badge');
+    if (badge) {
+      badge.textContent = job ? job.category : 'Careers';
+    }
+
+    const jobLocation = document.getElementById('form-job-location');
+    if (jobLocation && job) {
+      const jobMeta = [job.location, job.client, job.employment, job.status].filter(Boolean).join(' | ');
+      jobLocation.innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${escapeHTML(jobMeta)}`;
+    }
+    
+    // Hide standard forms and display Google Form launcher
+    const corpForm = document.getElementById('corporate-recruitment-form');
+    const manForm = document.getElementById('manpower-recruitment-form');
+    const ictForm = document.getElementById('ict-recruitment-form');
+    const ictChecklist = document.getElementById('ict-checklist-container');
+    const successPanel = document.getElementById('recruitment-success-panel');
+
+    if (corpForm) corpForm.style.display = 'none';
+    if (manForm) manForm.style.display = 'none';
+    if (ictForm) ictForm.style.display = 'none';
+    if (ictChecklist) ictChecklist.style.display = 'none';
+    if (successPanel) successPanel.style.display = 'none';
+
+    let googleCard = document.getElementById('google-form-redirect-card');
+    if (!googleCard) {
+      googleCard = document.createElement('div');
+      googleCard.id = 'google-form-redirect-card';
+      const formCard = document.querySelector('#application-form-view .form-card');
+      if (formCard) formCard.appendChild(googleCard);
+    }
+    
+    if (googleCard) {
+      googleCard.style.display = 'block';
+      googleCard.innerHTML = `
+        <div style="text-align: center; padding: 20px 10px;">
+          <div style="background: rgba(37, 99, 235, 0.1); color: var(--primary); width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
+            <i data-lucide="file-text"></i>
+          </div>
+          <h3 style="font-size: 1.6rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px;">
+            Apply via Official Google Form
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 540px; margin: 0 auto 24px; line-height: 1.6;">
+            Applications for <strong>${escapeHTML(jobTitle)}</strong> are collected securely through our official Google Application Form.
+          </p>
+          <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+            <a href="${targetUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 12px 28px; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);">
+              <i data-lucide="external-link"></i> Open Google Application Form
+            </a>
+            <button class="btn btn-outline" onclick="showJobBoard()" style="padding: 12px 20px;">
+              <i data-lucide="arrow-left"></i> Back to Job Listings
+            </button>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.8rem;">
+            * If the Google Form did not open in a new tab automatically, click the blue button above.
+          </p>
+        </div>
+      `;
+    }
+    
+    appView.scrollIntoView({ behavior: 'smooth' });
   }
-  
-  document.getElementById('form-job-title').textContent = job.title;
-  const jobMeta = [job.location, job.client, job.employment, job.status].filter(Boolean).join(' | ');
-  document.getElementById('form-job-location').innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${escapeHTML(jobMeta)}`;
-  
-  const corpForm = document.getElementById('corporate-recruitment-form');
-  const manForm = document.getElementById('manpower-recruitment-form');
-  const ictForm = document.getElementById('ict-recruitment-form');
-  const successPanel = document.getElementById('recruitment-success-panel');
-  
-  if (corpForm) corpForm.style.display = 'none';
-  if (manForm) manForm.style.display = 'none';
-  if (ictForm) ictForm.style.display = 'none';
-  if (successPanel) successPanel.style.display = 'none';
-  
-  if (isIct) {
-    if (ictForm) {
-      ictForm.style.display = 'block';
-      ictForm.reset();
-      resetIctUploadUI();
-      const subBtn = ictForm.querySelector('button[type="submit"]');
-      if (subBtn) subBtn.disabled = true;
-    }
-  } else if (!isManpower) {
-    if (corpForm) {
-      corpForm.style.display = 'block';
-      corpForm.reset();
-      document.getElementById('corp-hidden-position').value = job.title;
-      resetRecruitmentUploadUI('corp');
-    }
-  } else {
-    if (manForm) {
-      manForm.style.display = 'block';
-      manForm.reset();
-      document.getElementById('man-hidden-position').value = job.title;
-      resetRecruitmentUploadUI('man');
-    }
-  }
-  
-  const formHeader = document.getElementById('application-form-view');
-  if (formHeader) formHeader.scrollIntoView({ behavior: 'smooth' });
-  
+
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
@@ -2274,6 +2388,8 @@ window.showRecruitmentFallbackModal = function(portalType, form) {
   
   // Extract values dynamically
   const name = form.querySelector(`[name="name"]`) ? form.querySelector(`[name="name"]`).value.trim() : '';
+  const fatherName = form.querySelector(`[name="fatherName"]`) ? form.querySelector(`[name="fatherName"]`).value.trim() : (form.querySelector(`[name="parentName"]`) ? form.querySelector(`[name="parentName"]`).value.trim() : '');
+  const aadhaarNumber = form.querySelector(`[name="aadhaarNumber"]`) ? form.querySelector(`[name="aadhaarNumber"]`).value.trim() : '';
   const phone = form.querySelector(`[name="phone"]`) ? form.querySelector(`[name="phone"]`).value.trim() : '';
   const email = form.querySelector(`[name="email"]`) ? form.querySelector(`[name="email"]`).value.trim() : '';
   const address = form.querySelector(`[name="address"]`) ? form.querySelector(`[name="address"]`).value.trim() : '';
@@ -2289,47 +2405,49 @@ window.showRecruitmentFallbackModal = function(portalType, form) {
     const certifications = form.querySelector(`[name="certifications"]`) ? form.querySelector(`[name="certifications"]`).value.trim() : '';
     const linkedin = form.querySelector(`[name="linkedin"]`) ? form.querySelector(`[name="linkedin"]`).value.trim() : '';
     
-    msgText = `*Mildwave Marketing Corporate Job Application*
+    msgText = `*MILDWAVE MARKETING - CORPORATE APPLICATION*
 ----------------------------------------
+*Name:* ${name}
+*Father Name:* ${fatherName || 'N/A'}
+*Aadhaar Card No:* ${aadhaarNumber || 'N/A'}
+*Mobile No:* ${phone}
+*Place / Address:* ${address}
 *Position:* ${position}
-*Full Name:* ${name}
-*Mobile Number:* ${phone}
-*Email:* ${email}
-*Address:* ${address}
-*Highest Qualification:* ${qualification}
-*Years of Experience:* ${experience}
+*Email:* ${email || 'N/A'}
+*Qualification:* ${qualification}
+*Experience:* ${experience}
 *Skills:* ${skills}
 *Certifications:* ${certifications}
 *LinkedIn:* ${linkedin || 'N/A'}
-
-Note: I am sending my Resume PDF/Word file as an attachment in this message.`;
+----------------------------------------
+*Note:* Submitting application with Resume PDF / Documents.`;
   } else {
     const education = form.querySelector(`[name="education"]`) ? form.querySelector(`[name="education"]`).value : '';
     const experience = form.querySelector(`[name="experience"]`) ? form.querySelector(`[name="experience"]`).value.trim() : '';
-    const aadhaar = form.querySelector(`[name="aadhaarNumber"]`) ? form.querySelector(`[name="aadhaarNumber"]`).value.trim() : '';
     const pan = form.querySelector(`[name="panNumber"]`) ? form.querySelector(`[name="panNumber"]`).value.trim() : '';
     const prevEmployer = form.querySelector(`[name="prevEmployer"]`) ? form.querySelector(`[name="prevEmployer"]`).value.trim() : '';
     const police = form.querySelector(`[name="policeVerification"]`) ? form.querySelector(`[name="policeVerification"]`).value : '';
     const relocate = form.querySelector(`[name="readyToRelocate"]`) ? form.querySelector(`[name="readyToRelocate"]`).value : '';
     const shift = form.querySelector(`[name="prefShift"]`) ? form.querySelector(`[name="prefShift"]`).value : '';
     
-    msgText = `*Mildwave Marketing Manpower Job Application*
+    msgText = `*MILDWAVE MARKETING - MANPOWER APPLICATION*
 ----------------------------------------
+*Name:* ${name}
+*Father Name:* ${fatherName || 'N/A'}
+*Aadhaar Card No:* ${aadhaarNumber || 'N/A'}
+*Mobile No:* ${phone}
+*Place / Address:* ${address}
 *Position:* ${position}
-*Full Name:* ${name}
-*Mobile Number:* ${phone}
 *Email:* ${email || 'N/A'}
-*Address:* ${address}
-*Highest Education:* ${education}
-*Years of Experience:* ${experience}
-*Aadhaar Number:* ${aadhaar}
+*Qualification:* ${education}
+*Experience:* ${experience}
 *PAN Number:* ${pan || 'N/A'}
 *Previous Employer:* ${prevEmployer || 'N/A'}
 *Police Verification Available:* ${police}
 *Willing to Relocate:* ${relocate}
 *Preferred Work Shift:* ${shift}
-
-Note: I am sending my Aadhaar Card and Passport Photo as attachments in this message.`;
+----------------------------------------
+*Note:* Submitting application with Aadhaar Card and ID documents.`;
   }
   
   // Format WhatsApp Link
