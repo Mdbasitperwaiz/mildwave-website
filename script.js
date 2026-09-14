@@ -1,3 +1,21 @@
+// Disable browser automatic scroll restoration to ensure fresh load always starts at top
+if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
+// Force immediate scroll position to Y = 0 on fresh visit to root or home
+if (typeof window !== 'undefined') {
+  const initHash = window.location.hash;
+  if (!initHash || initHash === '#' || initHash === '#home') {
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+    if (initHash === '#home' && history.replaceState) {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }
+}
+
 // Mildwave Marketing PVT.LTD - Interactive Client Controller
 const API_BASE = (() => {
   if (typeof window === 'undefined') return '';
@@ -18,16 +36,20 @@ const GOOGLE_ICT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfJGDA7kGI
 const CURRENT_VACANCY = {
   title: 'ICT Lab Instructor – Phase 2',
   project: 'Kendriya Bhandar',
-  locations: ['Patna', 'Gaya', 'Jehanabad'],
+  locations: ['Patna', 'Gaya', 'Jehanabad', 'Madhubani', 'Champaran', 'Nawada'],
   status: 'HIRING NOW',
   active: true,
-  applicationUrl: GOOGLE_ICT_FORM_URL,
+  applicationUrl: '#careers',
   jobId: 'm_ict_instructor'
 };
 
 window.openCurrentVacancy = function(event) {
   if (event && event.preventDefault) event.preventDefault();
-  window.open(GOOGLE_ICT_FORM_URL, '_blank', 'noopener,noreferrer');
+  if (typeof window.applyForJob === 'function') {
+    window.applyForJob('m_ict_instructor');
+  } else {
+    window.location.hash = '#careers';
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -267,14 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Trigger SPA Router on initial load
-  handleRoute();
-  
-  // Load statutory documents dynamically from backend
-  if (typeof window.loadLegalDocuments === 'function') {
-    window.loadLegalDocuments();
-  }
-
   // Bind Career Portal Drag and Drop zones
   const careerDropzones = [
     { zoneId: 'corp-aadhaar-dropzone', inputId: 'corp-file-aadhaar', key: 'corp-aadhaar' },
@@ -311,10 +325,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Initialize Careers Portal (render corporate tab by default)
+  // Initialize Careers Portal (render corporate tab by default without scrolling)
   const corpBtn = document.getElementById('btn-corp-portal');
   if (corpBtn && typeof window.switchCareerPortal === 'function') {
     window.switchCareerPortal('corporate');
+  }
+
+  // Trigger SPA Router on initial load (clean hash & scroll position)
+  handleRoute(true);
+  
+  // Load statutory documents dynamically from backend
+  if (typeof window.loadLegalDocuments === 'function') {
+    window.loadLegalDocuments();
+  }
+});
+
+// Guard: Guarantee scroll position starts at top across browser load and bfcache events
+window.addEventListener('load', () => {
+  const hash = window.location.hash;
+  if (!hash || hash === '#' || hash === '#home') {
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  }
+});
+
+window.addEventListener('pageshow', () => {
+  const hash = window.location.hash;
+  if (!hash || hash === '#' || hash === '#home') {
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
   }
 });
 
@@ -325,19 +366,18 @@ function trackActiveNavLinks() {
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
   
-  let currentActiveSectionId = '';
+  let currentActiveSectionId = 'home';
   
-  sections.forEach(section => {
-    // Only track standard landing sections when on home view
-    const secId = section.getAttribute('id');
-    if (secId === 'projects' || secId === 'documents') return;
-
-    const sectionTop = section.offsetTop - 120;
-    const sectionHeight = section.offsetHeight;
-    if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
-      currentActiveSectionId = secId;
-    }
-  });
+  if (window.scrollY > 80) {
+    sections.forEach(section => {
+      const secId = section.getAttribute('id');
+      const sectionTop = section.offsetTop - 130;
+      const sectionHeight = section.offsetHeight;
+      if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+        currentActiveSectionId = secId;
+      }
+    });
+  }
 
   if (currentActiveSectionId) {
     navLinks.forEach(link => {
@@ -442,7 +482,7 @@ function redirectToWhatsApp(payload) {
 ----------------------------------------
 *Customer Name:* ${payload.name}
 *Mobile Number:* ${payload.phone}
-*Email Address:* ${payload.email}
+*Email Address:* ${payload.email || 'N/A'}
 *City:* ${payload.city} (Pincode: ${payload.pincode})
 *Property Type:* ${payload.type}
 *Service Required:* ${payload.serviceType}
@@ -453,7 +493,17 @@ function redirectToWhatsApp(payload) {
 
   const encodedText = encodeURIComponent(messageText);
   const waUrl = `https://wa.me/${waNumber}?text=${encodedText}`;
-  window.open(waUrl, '_blank');
+  
+  const directBtn = document.getElementById('ro-direct-whatsapp-btn');
+  if (directBtn) {
+    directBtn.href = waUrl;
+  }
+  
+  try {
+    window.open(waUrl, '_blank');
+  } catch (e) {
+    console.warn('Popup blocked, user can click direct button', e);
+  }
 }
 
 // 9. RO Service Booking submission
@@ -1602,51 +1652,62 @@ function showToastNotification(message, type = "success") {
 }
 
 // 17. SPA View Router Controller
-function handleRoute() {
-  let hash = window.location.hash;
-  if (!hash || hash === '#' || hash === '#careers') {
-    hash = '#home';
-  }
+function handleRoute(isInitial = false) {
+  const hash = window.location.hash;
   const sections = document.querySelectorAll('main > section');
   
+  // Keep all sections visible for continuous natural page scrolling
   sections.forEach(sec => {
-    const id = sec.getAttribute('id');
-    const hashId = id ? '#' + id : null;
-    
-    if (hash === '#home') {
-      // Home routing displays standard scrolling page sections
-      if (id === 'projects' || id === 'documents') {
-        sec.classList.add('faded-out');
-      } else {
-        sec.classList.remove('faded-out');
-      }
-    } else {
-      // Separate Page View routing displays only the requested section
-      if (hashId && hashId === hash) {
-        sec.classList.remove('faded-out');
-      } else {
-        sec.classList.add('faded-out');
-      }
-    }
+    sec.classList.remove('faded-out');
   });
 
   // Highlight navigation anchors on load / change
   const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
   navLinks.forEach(link => {
     link.classList.remove('active');
-    if (link.getAttribute('href') === hash) {
+    if (hash && link.getAttribute('href') === hash) {
       link.classList.add('active');
     }
   });
 
-  // Smooth scroll back to peak
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
+  // If a specific section hash is given (and not #home or empty), scroll to it
+  if (hash && hash !== '#home' && hash !== '#') {
+    const target = document.querySelector(hash);
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: isInitial ? 'auto' : 'smooth' });
+      }, isInitial ? 100 : 50);
+    }
+  } else {
+    // Landing on Root URL or #home
+    const homeLinks = document.querySelectorAll('.nav-links a[href="#home"], .mobile-nav-links a[href="#home"]');
+    homeLinks.forEach(link => link.classList.add('active'));
+
+    if (hash === '#home') {
+      if (!isInitial) {
+        // User explicitly clicked "Home" navigation link while already viewing the page
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Fresh initial page visit with #home in URL -> force top instantly
+        window.scrollTo(0, 0);
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      }
+      // Clean URL to root
+      if (history.replaceState) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    } else if (!hash || hash === '#') {
+      if (isInitial) {
+        window.scrollTo(0, 0);
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      }
+    }
+  }
 }
 
-window.addEventListener('hashchange', handleRoute);
+window.addEventListener('hashchange', () => handleRoute(false));
 
 // 18. Projects Interactive Categorization
 window.filterProjects = function(category) {
@@ -2032,28 +2093,27 @@ const MANPOWER_JOBS = [
     id: 'm_ict_instructor',
     title: 'ICT Lab Instructor – Phase 2',
     category: 'Manpower & Staff',
-    location: 'Patna | Gaya | Jehanabad, Bihar',
+    location: 'Patna, Gaya, Jehanabad, Madhubani, Champaran and Nawada, Bihar',
     client: 'Kendriya Bhandar',
     employment: 'Project-Based / Manpower Deployment',
     status: 'Hiring Now',
-    googleFormUrl: GOOGLE_ICT_FORM_URL,
-    salary: '',
-    experience: '',
-    description: 'Mildwave is currently providing ICT Lab Instructor manpower services for the Kendriya Bhandar Phase 2 project across Patna, Gaya and Jehanabad, Bihar.',
+    salary: 'Industry Standard / Project Scale',
+    experience: 'Graduation + 1-Year Computer Diploma',
+    description: 'Mildwave is currently providing ICT Lab Instructor manpower services for the Kendriya Bhandar Phase 2 project across Patna, Gaya, Jehanabad, Madhubani, Champaran and Nawada, Bihar.',
     details: {
-      about: 'We are inviting applications from eligible candidates for the position of ICT Lab Instructor under the Kendriya Bhandar Phase 2 project. Selected candidates may be deployed at designated locations in Patna, Gaya and Jehanabad, Bihar.',
+      about: 'We are inviting applications from eligible candidates for the position of ICT Lab Instructor under the Kendriya Bhandar Phase 2 project. Selected candidates will be deployed at designated institutions across Patna, Gaya, Jehanabad, Madhubani, Champaran and Nawada, Bihar.',
       responsibilities: [
-        'Conduct ICT/computer lab sessions.',
-        'Assist students and teachers with computer and digital-learning activities.',
-        'Provide basic technical support during lab sessions.',
-        'Maintain ICT lab equipment and ensure proper functioning.',
-        'Maintain required records and reports.',
-        'Support day-to-day ICT lab operations.',
-        'Follow project and organizational instructions.'
+        'Conduct ICT/computer lab sessions for students.',
+        'Assist students and teachers with computer operations and digital-learning tools.',
+        'Provide fundamental hardware and software technical support during lab sessions.',
+        'Maintain ICT lab equipment, power peripherals, and ensure smooth functioning.',
+        'Maintain daily lab registers, attendance logs, and equipment status reports.',
+        'Follow instructions and guidelines from Kendriya Bhandar and Mildwave coordinators.'
       ],
       requirements: [
-        'Documents required: Resume, two photographs, marksheets, graduation certificate/degree, computer diploma certificate, Aadhaar, PAN, and bank passbook/cancelled cheque.',
-        'Original Affidavit to be produced during physical document verification/joining as required.'
+        'Eligibility: Graduation Degree in any discipline + 1-Year Recognized Computer Diploma (ADCA / DCA / PGDCA / O-Level or equivalent).',
+        'Required Documents: Resume, Passport Photo, 10th & 12th Marksheets, Graduation Certificate, Computer Diploma, Aadhaar Card, PAN Card, and Bank Passbook / Cheque.',
+        'Original documents to be produced for physical verification upon selection.'
       ]
     }
   },
@@ -2219,90 +2279,66 @@ function isManpowerRole(title) {
   return manpowerRoles.some(role => lowerTitle.includes(role));
 }
 
+window.applyForJob = function(jobId) {
+  window.openApplicationForm(jobId);
+};
+
 window.openApplicationForm = function(jobId) {
-  if (jobId === 'm_ict_instructor') {
-    window.open(GOOGLE_ICT_FORM_URL, '_blank', 'noopener,noreferrer');
-    return;
-  }
-  const job = [...CORPORATE_JOBS, ...MANPOWER_JOBS].find(j => j.id === jobId);
-  const jobTitle = job ? job.title : 'Mildwave Career Opportunity';
-  const targetUrl = (job && job.googleFormUrl) ? job.googleFormUrl : GOOGLE_CAREERS_FORM_URL;
-  
-  showToastNotification(`Opening application form for "${jobTitle}"...`, "info");
+  const allJobs = [...CORPORATE_JOBS, ...MANPOWER_JOBS];
+  const job = allJobs.find(j => j.id === jobId) || allJobs.find(j => j.id === 'm_ict_instructor');
+  const jobTitle = job ? job.title : 'ICT Lab Instructor – Phase 2';
+  const jobCategory = job ? job.category : 'Manpower & Staff';
+  const jobLocation = job ? job.location : 'Patna, Gaya, Jehanabad, Madhubani, Champaran and Nawada, Bihar';
 
-  // Attempt to open the Google Form in a new tab
-  const win = window.open(targetUrl, '_blank', 'noopener,noreferrer');
-
-  // Also display the Google Form redirection assistant in the careers view
   const jobBoard = document.getElementById('job-board-view');
   const appView = document.getElementById('application-form-view');
+  const unifiedForm = document.getElementById('unified-application-form');
+  const successPanel = document.getElementById('recruitment-success-panel');
+  const ictChecklist = document.getElementById('ict-checklist-container');
+
   if (jobBoard) jobBoard.style.display = 'none';
+  if (appView) appView.style.display = 'block';
+
+  // Update header details
+  const formTitle = document.getElementById('form-job-title');
+  if (formTitle) formTitle.textContent = jobTitle;
+
+  const formBadge = document.getElementById('form-job-badge');
+  if (formBadge) formBadge.textContent = jobCategory;
+
+  const formLocation = document.getElementById('form-job-location');
+  if (formLocation) {
+    formLocation.innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${escapeHTML(jobLocation)}`;
+  }
+
+  // Pre-fill hidden inputs in unified form
+  const posInput = document.getElementById('app-position-input');
+  if (posInput) posInput.value = jobTitle;
+
+  const idInput = document.getElementById('app-job-id');
+  if (idInput) idInput.value = job ? job.id : (jobId || 'm_ict_instructor');
+
+  // Toggle ICT document checklist
+  if (ictChecklist) {
+    if (job && (job.id === 'm_ict_instructor' || job.title.includes('ICT'))) {
+      ictChecklist.style.display = 'block';
+    } else {
+      ictChecklist.style.display = 'none';
+    }
+  }
+
+  // Reset form views
+  if (unifiedForm) {
+    unifiedForm.style.display = 'block';
+  }
+  if (successPanel) {
+    successPanel.style.display = 'none';
+  }
+  const progress = document.getElementById('app-submit-progress');
+  if (progress) progress.style.display = 'none';
+
+  // Smooth scroll to form
   if (appView) {
-    appView.style.display = 'block';
-    
-    const formTitle = document.getElementById('form-job-title');
-    if (formTitle) formTitle.textContent = jobTitle;
-    
-    const badge = document.getElementById('form-job-badge');
-    if (badge) {
-      badge.textContent = job ? job.category : 'Careers';
-    }
-
-    const jobLocation = document.getElementById('form-job-location');
-    if (jobLocation && job) {
-      const jobMeta = [job.location, job.client, job.employment, job.status].filter(Boolean).join(' | ');
-      jobLocation.innerHTML = `<i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> ${escapeHTML(jobMeta)}`;
-    }
-    
-    // Hide standard forms and display Google Form launcher
-    const corpForm = document.getElementById('corporate-recruitment-form');
-    const manForm = document.getElementById('manpower-recruitment-form');
-    const ictForm = document.getElementById('ict-recruitment-form');
-    const ictChecklist = document.getElementById('ict-checklist-container');
-    const successPanel = document.getElementById('recruitment-success-panel');
-
-    if (corpForm) corpForm.style.display = 'none';
-    if (manForm) manForm.style.display = 'none';
-    if (ictForm) ictForm.style.display = 'none';
-    if (ictChecklist) ictChecklist.style.display = 'none';
-    if (successPanel) successPanel.style.display = 'none';
-
-    let googleCard = document.getElementById('google-form-redirect-card');
-    if (!googleCard) {
-      googleCard = document.createElement('div');
-      googleCard.id = 'google-form-redirect-card';
-      const formCard = document.querySelector('#application-form-view .form-card');
-      if (formCard) formCard.appendChild(googleCard);
-    }
-    
-    if (googleCard) {
-      googleCard.style.display = 'block';
-      googleCard.innerHTML = `
-        <div style="text-align: center; padding: 20px 10px;">
-          <div style="background: rgba(37, 99, 235, 0.1); color: var(--primary); width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;">
-            <i data-lucide="file-text"></i>
-          </div>
-          <h3 style="font-size: 1.6rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px;">
-            Apply via Official Google Form
-          </h3>
-          <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 540px; margin: 0 auto 24px; line-height: 1.6;">
-            Applications for <strong>${escapeHTML(jobTitle)}</strong> are collected securely through our official Google Application Form.
-          </p>
-          <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-            <a href="${targetUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 12px 28px; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);">
-              <i data-lucide="external-link"></i> Open Google Application Form
-            </a>
-            <button class="btn btn-outline" onclick="showJobBoard()" style="padding: 12px 20px;">
-              <i data-lucide="arrow-left"></i> Back to Job Listings
-            </button>
-          </div>
-          <p style="color: var(--text-muted); font-size: 0.8rem;">
-            * If the Google Form did not open in a new tab automatically, click the blue button above.
-          </p>
-        </div>
-      `;
-    }
-    
     appView.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -2312,11 +2348,251 @@ window.openApplicationForm = function(jobId) {
 };
 
 window.showJobBoard = function() {
-  document.getElementById('job-board-view').style.display = 'block';
-  document.getElementById('application-form-view').style.display = 'none';
-  
-  const careersSection = document.getElementById('careers');
-  if (careersSection) careersSection.scrollIntoView({ behavior: 'smooth' });
+  const jobBoard = document.getElementById('job-board-view');
+  const appView = document.getElementById('application-form-view');
+  if (jobBoard) jobBoard.style.display = 'block';
+  if (appView) appView.style.display = 'none';
+};
+
+window.handleSingleFileSelect = function(event, titleId, metaId, zoneId) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const title = document.getElementById(titleId);
+  const meta = document.getElementById(metaId);
+  const zone = document.getElementById(zoneId);
+
+  const allowedExtensions = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+
+  if (!allowedExtensions.includes(ext)) {
+    showToastNotification(`Invalid format (${ext}). Supported formats: PDF, DOC, DOCX, JPG, PNG`, "error");
+    event.target.value = '';
+    return;
+  }
+
+  const maxMB = (file.type && file.type.startsWith('image/')) ? 3 : 5;
+  if (file.size > maxMB * 1024 * 1024) {
+    showToastNotification(`File exceeds ${maxMB}MB limit. Please upload a smaller file.`, "error");
+    event.target.value = '';
+    return;
+  }
+
+  const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+  if (title) title.textContent = file.name;
+  if (meta) meta.textContent = `Attached (${sizeMB} MB) ✓`;
+  if (zone) {
+    zone.classList.add('selected');
+    zone.style.borderColor = '#10b981';
+    zone.style.background = '#f0fdf4';
+  }
+};
+
+window.handleUnifiedApplicationSubmit = function(event) {
+  event.preventDefault();
+  const form = document.getElementById('unified-application-form');
+  if (!form) return;
+
+  const name = form.querySelector('[name="name"]');
+  const fatherName = form.querySelector('[name="fatherName"]');
+  const phone = form.querySelector('[name="phone"]');
+  const email = form.querySelector('[name="email"]');
+  const address = form.querySelector('[name="address"]');
+  const district = form.querySelector('[name="district"]');
+  const prefLocation = form.querySelector('[name="prefLocation"]');
+  const qualification = form.querySelector('[name="qualification"]');
+  const diploma = form.querySelector('[name="diploma"]');
+  const experience = form.querySelector('[name="experience"]');
+  const resumeFile = document.getElementById('app-file-resume');
+  const resumeZone = document.getElementById('app-resume-dropzone');
+  const declaration = document.getElementById('app-declaration');
+  const jobId = document.getElementById('app-job-id') ? document.getElementById('app-job-id').value : '';
+
+  // Validation
+  if (!name || name.value.trim().length < 2) {
+    highlightError(name, false);
+    name.focus();
+    showToastNotification("Please enter candidate full name (at least 2 characters).", "error");
+    return;
+  } else { highlightError(name, true); }
+
+  if (!fatherName || fatherName.value.trim().length < 2) {
+    highlightError(fatherName, false);
+    fatherName.focus();
+    showToastNotification("Please enter father's or parent's name.", "error");
+    return;
+  } else { highlightError(fatherName, true); }
+
+  if (!phone || !validatePhone(phone.value)) {
+    highlightError(phone, false);
+    phone.focus();
+    showToastNotification("Please enter a valid 10-digit mobile number.", "error");
+    return;
+  } else { highlightError(phone, true); }
+
+  if (!email || !validateEmail(email.value)) {
+    highlightError(email, false);
+    email.focus();
+    showToastNotification("Please enter a valid email address.", "error");
+    return;
+  } else { highlightError(email, true); }
+
+  if (!address || address.value.trim().length < 3) {
+    highlightError(address, false);
+    address.focus();
+    showToastNotification("Please enter full residential address.", "error");
+    return;
+  } else { highlightError(address, true); }
+
+  if (!district || district.value.trim().length < 2) {
+    highlightError(district, false);
+    district.focus();
+    showToastNotification("Please enter your district or city.", "error");
+    return;
+  } else { highlightError(district, true); }
+
+  if (!prefLocation || !prefLocation.value) {
+    highlightError(prefLocation, false);
+    prefLocation.focus();
+    showToastNotification("Please select your preferred work location.", "error");
+    return;
+  } else { highlightError(prefLocation, true); }
+
+  if (!qualification || !qualification.value) {
+    highlightError(qualification, false);
+    qualification.focus();
+    showToastNotification("Please select your highest educational qualification.", "error");
+    return;
+  } else { highlightError(qualification, true); }
+
+  if (jobId === 'm_ict_instructor' && (!diploma || diploma.value.trim().length < 2)) {
+    highlightError(diploma, false);
+    diploma.focus();
+    showToastNotification("Computer diploma (e.g. ADCA, DCA, PGDCA) is required for ICT Lab Instructor.", "error");
+    return;
+  } else if (diploma) { highlightError(diploma, true); }
+
+  if (!experience || !experience.value) {
+    highlightError(experience, false);
+    experience.focus();
+    showToastNotification("Please select your total work experience.", "error");
+    return;
+  } else { highlightError(experience, true); }
+
+  if (!resumeFile || resumeFile.files.length === 0) {
+    if (resumeZone) {
+      resumeZone.style.borderColor = '#ef4444';
+      resumeZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    showToastNotification("Please attach your Resume / CV (mandatory).", "error");
+    return;
+  }
+
+  if (!declaration || !declaration.checked) {
+    showToastNotification("Please confirm the certification declaration checkbox before submitting.", "error");
+    if (declaration) declaration.focus();
+    return;
+  }
+
+  // Setup Progress & UI state
+  const submitBtn = document.getElementById('app-submit-btn');
+  const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    submitBtn.innerHTML = `<span class="btn-spinner"></span> Submitting Application...`;
+  }
+
+  const progressContainer = document.getElementById('app-submit-progress');
+  const progressPercent = document.getElementById('app-progress-percent');
+  const progressFill = document.getElementById('app-progress-fill');
+  const progressStatus = document.getElementById('app-progress-status');
+
+  if (progressContainer) {
+    progressContainer.style.display = 'block';
+    if (progressPercent) progressPercent.textContent = '0%';
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressStatus) progressStatus.textContent = 'Uploading application and documents...';
+  }
+
+  const formData = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `${API_BASE}/api/careers/apply`, true);
+
+  xhr.upload.addEventListener('progress', (e) => {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      if (progressPercent) progressPercent.textContent = `${percent}%`;
+      if (progressFill) progressFill.style.width = `${percent}%`;
+      if (percent >= 100 && progressStatus) {
+        progressStatus.textContent = 'Processing and verifying application in database...';
+      }
+    }
+  });
+
+  xhr.addEventListener('load', () => {
+    if (progressContainer) progressContainer.style.display = 'none';
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      submitBtn.innerHTML = originalBtnText;
+    }
+
+    if (xhr.status === 200 || xhr.status === 201) {
+      let resData = {};
+      try { resData = JSON.parse(xhr.responseText); } catch (e) {}
+
+      showToastNotification("Application submitted and registered successfully!");
+      
+      form.style.display = 'none';
+      const successPanel = document.getElementById('recruitment-success-panel');
+      if (successPanel) successPanel.style.display = 'block';
+
+      // Update Tracking ID and Applicant Summary
+      const appIdEl = document.getElementById('success-app-id');
+      if (appIdEl) appIdEl.textContent = resData.applicationId || 'MW-APP-2026-CONFIRMED';
+
+      const sName = document.getElementById('summary-cand-name');
+      const sPos = document.getElementById('summary-cand-pos');
+      const sMobile = document.getElementById('summary-cand-mobile');
+      const sLoc = document.getElementById('summary-cand-loc');
+
+      if (sName) sName.textContent = name.value.trim();
+      if (sPos) sPos.textContent = form.querySelector('[name="position"]') ? form.querySelector('[name="position"]').value : 'ICT Lab Instructor';
+      if (sMobile) sMobile.textContent = phone.value.trim();
+      if (sLoc) sLoc.textContent = prefLocation.value || district.value.trim();
+
+      // Configure direct WhatsApp button
+      const waBtn = document.getElementById('recruitment-whatsapp-direct-btn');
+      if (waBtn) {
+        const waMsg = resData.whatsappMsg || `*MILDWAVE MARKETING - APPLICATION CONFIRMATION*\nTracking ID: ${resData.applicationId || 'MW-APP-2026'}\nCandidate: ${name.value.trim()}\nMobile: ${phone.value.trim()}\nPosition: ${form.querySelector('[name="position"]')?.value || 'Job Application'}\n\nMy documents and application are logged into your master recruitment database.`;
+        waBtn.href = `https://wa.me/918544071616?text=${encodeURIComponent(waMsg)}`;
+      }
+
+      form.reset();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      if (successPanel) successPanel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      let errorMsg = "Unable to submit your application right now. Please try again later.";
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (res.error) errorMsg = res.error;
+      } catch (e) {}
+      showToastNotification(errorMsg, "error");
+    }
+  });
+
+  xhr.addEventListener('error', () => {
+    if (progressContainer) progressContainer.style.display = 'none';
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      submitBtn.innerHTML = originalBtnText;
+    }
+    showToastNotification("Network connection error. Unable to submit application.", "error");
+  });
+
+  xhr.send(formData);
 };
 
 window.showJobDetails = function(jobId) {

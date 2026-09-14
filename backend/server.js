@@ -159,8 +159,8 @@ if (!fs.existsSync(SECURE_UPLOADS_DIR)) {
   fs.mkdirSync(SECURE_UPLOADS_DIR, { recursive: true });
 }
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(UPLOADS_DIR));
+// Serve uploaded files statically (directory listing disabled)
+app.use('/uploads', express.static(UPLOADS_DIR, { dotfiles: 'ignore', index: false }));
 
 // Serve static frontend files
 app.use(express.static(path.resolve(__dirname, '../frontend')));
@@ -428,8 +428,24 @@ const storage = multer.diskStorage({
 // File Filter for Career Resumes and KYC (PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP)
 const careerFileFilter = (req, file, cb) => {
   const allowedExtensions = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.webp'];
+  const allowedMimeTypes = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+  const dangerousExtensions = ['.exe', '.bat', '.cmd', '.sh', '.php', '.js', '.html', '.htm', '.svg', '.vbs', '.ps1', '.jar'];
+
   const ext = path.extname(file.originalname).toLowerCase();
-  if (allowedExtensions.includes(ext)) {
+  const mime = (file.mimetype || '').toLowerCase();
+
+  if (dangerousExtensions.includes(ext)) {
+    return cb(new Error(`Executable or script file type "${ext}" is strictly forbidden.`));
+  }
+
+  if (allowedExtensions.includes(ext) && (allowedMimeTypes.includes(mime) || mime === 'application/octet-stream')) {
     cb(null, true);
   } else {
     cb(new Error(`Invalid file format for "${file.originalname}". Only PDF, Word (.doc/.docx), and Image (.jpg/.jpeg/.png) files are allowed.`));
@@ -439,7 +455,8 @@ const careerFileFilter = (req, file, cb) => {
 // File Filter for Statutory Documents (PDF only)
 const docFileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
-  if (ext === '.pdf') {
+  const mime = (file.mimetype || '').toLowerCase();
+  if (ext === '.pdf' && (mime === 'application/pdf' || mime === 'application/octet-stream')) {
     cb(null, true);
   } else {
     cb(new Error('Statutory documents must be in PDF format.'));
@@ -449,7 +466,7 @@ const docFileFilter = (req, file, cb) => {
 const uploadCareer = multer({
   storage: storage,
   fileFilter: careerFileFilter,
-  limits: { fileSize: 15 * 1024 * 1024 }
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
 const uploadCareerFields = uploadCareer.fields([
@@ -1029,8 +1046,8 @@ Document Link: ${docUrl || 'No file attached'}`;
 const handleUniversalApply = async (req, res) => {
   try {
     const { 
-      name, fatherName, parentName, phone, mobile, email, address, place, position, jobTitle, 
-      aadhaarNumber, aadhaar, message, qualification, education, experience, skills 
+      name, fatherName, parentName, phone, mobile, whatsapp, email, address, place, position, jobTitle, 
+      aadhaarNumber, aadhaar, dob, district, location, prefLocation, qualification, education, experience, skills, message 
     } = req.body || {};
 
     const candidateName = (name || '').trim();
@@ -1040,29 +1057,52 @@ const handleUniversalApply = async (req, res) => {
     const candidatePlace = (place || address || '').trim();
     const candidatePosition = (position || jobTitle || 'General Applicant').trim();
     const candidateEmail = (email || '').trim();
+    const candidateDob = (dob || '').trim();
+    const candidateDistrict = (district || '').trim();
+    const candidatePrefLocation = (prefLocation || location || '').trim();
 
-    if (!candidateName || candidateName.length < 2) return res.status(400).json({ error: "Name is required." });
+    if (!candidateName || candidateName.length < 2) return res.status(400).json({ error: "Candidate full name is required (minimum 2 characters)." });
     if (!candidatePhone || candidatePhone.length < 10) return res.status(400).json({ error: "Valid 10-digit mobile number is required." });
 
-    const fileObj = req.files ? Object.values(req.files).flat()[0] : (req.file || null);
-    const docUrl = fileObj ? `${req.protocol}://${req.get('host')}/uploads/${fileObj.filename}` : '';
+    const uploadedFiles = {};
+    let primaryDocUrl = '';
+    if (req.files) {
+      for (const [key, fileArr] of Object.entries(req.files)) {
+        if (fileArr && fileArr[0]) {
+          const fUrl = `${req.protocol}://${req.get('host')}/uploads/${fileArr[0].filename}`;
+          uploadedFiles[key] = `/uploads/${fileArr[0].filename}`;
+          if (!primaryDocUrl) primaryDocUrl = fUrl;
+        }
+      }
+    } else if (req.file) {
+      primaryDocUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      uploadedFiles['resume'] = `/uploads/${req.file.filename}`;
+    }
+
+    const uniqueNum = Math.floor(1000 + Math.random() * 9000);
+    const appId = `MW-APP-2026-${uniqueNum}`;
 
     const newApp = {
       id: 'app_' + Date.now(),
+      applicationId: appId,
       name: candidateName,
       fatherName: candidateFather,
+      dob: candidateDob,
       aadhaarNumber: candidateAadhaar,
       phone: candidatePhone,
+      whatsapp: (whatsapp || candidatePhone).trim(),
       email: candidateEmail,
       address: candidatePlace,
       place: candidatePlace,
+      district: candidateDistrict,
+      prefLocation: candidatePrefLocation,
       position: candidatePosition,
       qualification: (qualification || education || '').trim(),
       experience: (experience || '').trim(),
       skills: (skills || '').trim(),
       message: (message || '').trim(),
-      docUrl: docUrl,
-      files: fileObj ? { resume: `/uploads/${fileObj.filename}` } : {},
+      docUrl: primaryDocUrl,
+      files: uploadedFiles,
       appliedAt: new Date().toISOString()
     };
 
@@ -1071,8 +1111,16 @@ const handleUniversalApply = async (req, res) => {
     candidates.push(newApp);
     await writeDb('candidates.json', candidates);
 
+    // If ICT role, also store in ict_applications.json
+    if (candidatePosition.toLowerCase().includes('ict')) {
+      const ictApps = await readDb('ict_applications.json');
+      ictApps.push(newApp);
+      await writeDb('ict_applications.json', ictApps);
+    }
+
     // Also append to manpower_applications.json for manpower roles
     const isManpower = candidatePosition.toLowerCase().includes('manpower') ||
+                       candidatePosition.toLowerCase().includes('ict') ||
                        candidatePosition.toLowerCase().includes('security') ||
                        candidatePosition.toLowerCase().includes('electrician') ||
                        candidatePosition.toLowerCase().includes('plumber') ||
@@ -1092,30 +1140,32 @@ const handleUniversalApply = async (req, res) => {
       place: newApp.address,
       position: newApp.position,
       email: newApp.email,
-      docLink: docUrl,
+      docLink: primaryDocUrl,
       appliedAt: newApp.appliedAt
     }).catch(e => console.error("CSV append error:", e.message));
 
     const whatsappMsg = `*MILDWAVE MARKETING - APPLICANT RECORD*
 ----------------------------------------
+*App ID:* ${appId}
 *Name:* ${newApp.name}
 *Father Name:* ${newApp.fatherName || 'N/A'}
-*Aadhaar Card No:* ${newApp.aadhaarNumber || 'N/A'}
 *Mobile No:* ${newApp.phone}
 *Place:* ${newApp.address}
 *Position:* ${newApp.position}
-*Document Link:* ${docUrl || 'Attached in chat'}
+*Preferred Location:* ${newApp.prefLocation || 'Any'}
+*Document Attached:* ${primaryDocUrl ? 'Yes' : 'Pending'}
 ----------------------------------------`;
 
     return res.status(201).json({
       success: true,
+      applicationId: appId,
       candidate: newApp,
-      docLink: docUrl,
+      docLink: primaryDocUrl,
       whatsappMsg: whatsappMsg
     });
   } catch (error) {
     console.error("Universal apply error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error during application processing." });
   }
 };
 
@@ -1230,8 +1280,30 @@ app.get('/api/documents', async (req, res) => {
   }
 });
 
-// 7. POST /api/document-upload - Administrative legal uploads
-app.post('/api/document-upload', (req, res) => {
+// Admin Authentication middleware
+const authAdmin = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return res.status(401).json({ error: "Access Denied. Authorization Header missing." });
+  
+  const token = authHeader.replace('Bearer ', '');
+  const expectedUser = process.env.ADMIN_USER || 'admin';
+  const expectedPass = process.env.ADMIN_PASS || 'MildwaveAdmin2026!';
+  
+  try {
+    const credentials = Buffer.from(token, 'base64').toString('ascii');
+    const [user, pass] = credentials.split(':');
+    if (user === expectedUser && pass === expectedPass) {
+      next();
+    } else {
+      res.status(403).json({ error: "Forbidden. Invalid credentials." });
+    }
+  } catch (err) {
+    res.status(400).json({ error: "Invalid authentication format" });
+  }
+};
+
+// 7. POST /api/document-upload - Administrative legal uploads (Guarded by authAdmin)
+app.post('/api/document-upload', authAdmin, (req, res) => {
   uploadDoc.single('document')(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -1272,28 +1344,6 @@ app.post('/api/document-upload', (req, res) => {
     }
   });
 });
-
-// Admin Authentication middleware
-const authAdmin = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader) return res.status(401).json({ error: "Access Denied. Authorization Header missing." });
-  
-  const token = authHeader.replace('Bearer ', '');
-  const expectedUser = process.env.ADMIN_USER || 'admin';
-  const expectedPass = process.env.ADMIN_PASS || 'MildwaveAdmin2026!';
-  
-  try {
-    const credentials = Buffer.from(token, 'base64').toString('ascii');
-    const [user, pass] = credentials.split(':');
-    if (user === expectedUser && pass === expectedPass) {
-      next();
-    } else {
-      res.status(403).json({ error: "Forbidden. Invalid credentials." });
-    }
-  } catch (err) {
-    res.status(400).json({ error: "Invalid authentication format" });
-  }
-};
 
 // 8. POST /api/careers/ict - ICT Lab Instructor Phase 2 applications
 app.post('/api/careers/ict', (req, res) => {

@@ -5,6 +5,7 @@ const cssPath = path.join(__dirname, 'style.css');
 const minCssPath = path.join(__dirname, 'style.min.css');
 const jsPath = path.join(__dirname, 'script.js');
 const minJsPath = path.join(__dirname, 'script.min.js');
+const frontendDir = path.join(__dirname, 'frontend');
 
 try {
   // 1. Minify CSS
@@ -45,7 +46,20 @@ try {
 
   fs.writeFileSync(minJsPath, minJs, 'utf8');
   console.log(`JS minified: ${js.length} bytes -> ${minJs.length} bytes.`);
-  console.log("Minification complete!");
+
+  // 3. Sync to frontend directory if it exists
+  if (fs.existsSync(frontendDir)) {
+    console.log("Syncing to frontend directory...");
+    fs.copyFileSync(jsPath, path.join(frontendDir, 'script.js'));
+    fs.copyFileSync(minJsPath, path.join(frontendDir, 'script.min.js'));
+    fs.copyFileSync(cssPath, path.join(frontendDir, 'style.css'));
+    fs.copyFileSync(minCssPath, path.join(frontendDir, 'style.min.css'));
+    fs.copyFileSync(path.join(__dirname, 'index.html'), path.join(frontendDir, 'index.html'));
+    fs.copyFileSync(path.join(__dirname, '404.html'), path.join(frontendDir, '404.html'));
+    console.log("Frontend directory synchronized successfully!");
+  }
+
+  console.log("Minification and sync complete!");
 } catch (err) {
   console.error("Error during minification:", err);
 }
