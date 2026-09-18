@@ -51,7 +51,7 @@
   </script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="style.min.css?v=16">
+  <link rel="stylesheet" href="style.min.css?v=21">
   
   <!-- Lucide Icons CDN for sleek, modern SVG icons -->
   <script src="https://unpkg.com/lucide@latest" defer></script>
@@ -128,8 +128,8 @@
     <header class="navbar" id="main-navbar">
       <div class="container navbar-container">
         <!-- Company Logo -->
-        <a href="#home" class="brand-container" id="nav-logo">
-          <img src="assets/logo.png" alt="Mildwave Logo" width="130" height="130">
+        <a href="#home" class="brand-container" id="nav-logo" aria-label="Mildwave Marketing Homepage">
+          <img src="assets/logo.png" alt="Mildwave Logo" width="46" height="46">
           <div class="brand-name">MILD<span>WAVE</span></div>
         </a>
 
@@ -143,7 +143,7 @@
             <li><a href="#projects">Projects</a></li>
             <li><a href="#about">About Us</a></li>
             <li><a href="#documents">Documents</a></li>
-            <li><a href="flyer.html" target="_blank" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
+            <li><a href="flyer.html" target="_blank" rel="noopener noreferrer" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
             <li><a href="#careers">Careers</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -152,7 +152,7 @@
         <!-- Navbar CTA Buttons -->
         <div class="navbar-cta">
           <button class="btn btn-primary btn-sm" id="btn-navbar-quote" onclick="toggleQuoteModal(true)">Get Free Quote</button>
-          <div class="mobile-toggle" id="menu-toggle-btn" aria-label="Open Menu">
+          <div class="mobile-toggle" id="menu-toggle-btn" aria-label="Open Menu" role="button" tabindex="0">
             <i data-lucide="menu"></i>
           </div>
         </div>
@@ -165,10 +165,10 @@
   <aside class="mobile-nav" id="mobile-sidebar-menu" aria-label="Mobile Navigation">
     <div class="mobile-nav-header">
       <div class="brand-container">
-        <img src="assets/logo.png" alt="Mildwave Logo" width="130" height="130">
+        <img src="assets/logo.png" alt="Mildwave Logo" width="40" height="40">
         <div class="brand-name">MILD<span>WAVE</span></div>
       </div>
-      <div class="mobile-nav-close" id="menu-close-btn" aria-label="Close Menu">
+      <div class="mobile-nav-close" id="menu-close-btn" aria-label="Close Menu" role="button" tabindex="0">
         <i data-lucide="x"></i>
       </div>
     </div>
@@ -180,7 +180,7 @@
       <li><a href="#projects" onclick="closeMobileMenu()">Projects</a></li>
       <li><a href="#about" onclick="closeMobileMenu()">About Us</a></li>
       <li><a href="#documents" onclick="closeMobileMenu()">Documents</a></li>
-      <li><a href="flyer.html" target="_blank" onclick="closeMobileMenu()" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
+      <li><a href="flyer.html" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
       <li><a href="#careers" onclick="closeMobileMenu()">Careers</a></li>
       <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
     </ul>
@@ -1789,8 +1789,8 @@
     <div class="container footer-grid">
       <!-- Brand Column -->
       <div class="footer-brand">
-        <a href="#home" class="brand-container">
-          <img src="assets/logo.png" alt="Mildwave Logo" width="130" height="130" loading="lazy">
+        <a href="#home" class="brand-container" aria-label="Mildwave Marketing Homepage">
+          <img src="assets/logo.png" alt="Mildwave Logo" width="48" height="48" loading="lazy">
           <div class="brand-name" style="color: var(--text-white);">MILD<span>WAVE</span></div>
         </a>
         <p>Mildwave Marketing Pvt. Ltd. is India's premier multi-service corporate vendor providing end-to-end IT, infrastructure construction, manpower deployment, and smart RO purification AMC setups.</p>
