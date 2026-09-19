@@ -338,6 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof window.loadLegalDocuments === 'function') {
     window.loadLegalDocuments();
   }
+
+  // Initialize navbar dropdown handlers
+  initNavbarDropdowns();
 });
 
 // Guard: Guarantee scroll position starts at top across browser load and bfcache events
@@ -362,10 +365,9 @@ window.addEventListener('pageshow', () => {
 // 5. Section Active State Link Highlighting Logic (Scroll-based active states)
 function trackActiveNavLinks() {
   const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
   
   let currentActiveSectionId = 'home';
-  const scrollPos = window.scrollY + 120;
+  const scrollPos = window.scrollY + 140;
   
   sections.forEach(section => {
     const secId = section.getAttribute('id');
@@ -376,21 +378,143 @@ function trackActiveNavLinks() {
     }
   });
 
-  if (currentActiveSectionId) {
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        if (href === `#${currentActiveSectionId}`) {
-          link.classList.add('active');
+  // Map sub-sections to their parent navigation categories
+  let parentMenuSection = currentActiveSectionId;
+  if (['services', 'service-posters', 'service-it', 'service-ro', 'service-civil', 'service-manpower', 'service-supply', 'service-pest', 'service-tank', 'service-pipeline'].includes(currentActiveSectionId)) {
+    parentMenuSection = 'services';
+  } else if (['ro-amc-plans', 'amc-basic', 'amc-classic', 'amc-green', 'amc-green-plus'].includes(currentActiveSectionId)) {
+    parentMenuSection = 'ro-amc-plans';
+  } else if (['manpower-charges'].includes(currentActiveSectionId)) {
+    parentMenuSection = 'manpower-charges';
+  } else if (['projects', 'project-ict-instructor', 'project-ro-water', 'project-bihar-manpower', 'project-kb-ict', 'project-govt-supply', 'project-digital-solutions'].includes(currentActiveSectionId)) {
+    parentMenuSection = 'projects';
+  } else if (['about', 'process-section', 'clients-partners', 'about-why-choose'].includes(currentActiveSectionId)) {
+    parentMenuSection = 'about';
+  } else if (['documents', 'doc-profile', 'doc-registration', 'doc-gst', 'doc-brochure', 'doc-terms', 'doc-flyer'].includes(currentActiveSectionId)) {
+    parentMenuSection = 'documents';
+  } else if (currentActiveSectionId === 'careers') {
+    parentMenuSection = 'careers';
+  } else if (currentActiveSectionId === 'contact') {
+    parentMenuSection = 'contact';
+  } else if (currentActiveSectionId === 'home') {
+    parentMenuSection = 'home';
+  }
+
+  // Highlight active link in desktop navbar
+  document.querySelectorAll('.nav-links .nav-item').forEach(item => {
+    const mainLink = item.querySelector(':scope > .nav-link, :scope > a');
+    if (mainLink) {
+      const href = mainLink.getAttribute('href');
+      if (href === `#${parentMenuSection}` || (parentMenuSection === 'home' && href === '#home')) {
+        mainLink.classList.add('active');
+      } else {
+        mainLink.classList.remove('active');
+      }
+    }
+  });
+
+  // Highlight active link in mobile drawer
+  document.querySelectorAll('.mobile-nav-links .mobile-nav-item').forEach(item => {
+    const isDropdown = item.classList.contains('mobile-dropdown');
+    if (isDropdown) {
+      const dropType = item.getAttribute('data-mobile-dropdown');
+      const header = item.querySelector('.mobile-dropdown-header');
+      if (header) {
+        if ((dropType === 'services' && parentMenuSection === 'services') ||
+            (dropType === 'amc' && parentMenuSection === 'ro-amc-plans') ||
+            (dropType === 'manpower' && parentMenuSection === 'manpower-charges') ||
+            (dropType === 'projects' && parentMenuSection === 'projects') ||
+            (dropType === 'about' && parentMenuSection === 'about') ||
+            (dropType === 'documents' && parentMenuSection === 'documents')) {
+          header.classList.add('active');
         } else {
-          link.classList.remove('active');
+          header.classList.remove('active');
         }
       }
-    });
-  }
+    } else {
+      const directLink = item.querySelector('.mobile-nav-link');
+      if (directLink) {
+        const href = directLink.getAttribute('href');
+        if (href === `#${parentMenuSection}`) {
+          directLink.classList.add('active');
+        } else {
+          directLink.classList.remove('active');
+        }
+      }
+    }
+  });
 }
 
-// 6. Mobile Sidebar drawer controls
+// 6. Desktop Dropdown Interactions (Hover + Click Support)
+function initNavbarDropdowns() {
+  const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+  dropdownItems.forEach(item => {
+    const toggle = item.querySelector('.dropdown-toggle');
+    const menu = item.querySelector('.dropdown-menu');
+
+    if (toggle) {
+      toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isOpen = item.classList.contains('is-open');
+
+        // Close all other dropdowns
+        dropdownItems.forEach(other => {
+          if (other !== item) {
+            other.classList.remove('is-open');
+            const otherToggle = other.querySelector('.dropdown-toggle');
+            if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // Toggle current dropdown
+        if (isOpen) {
+          item.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        } else {
+          item.classList.add('is-open');
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+
+    // Close when clicking any sub-link inside dropdown
+    if (menu) {
+      menu.querySelectorAll('a').forEach(subLink => {
+        subLink.addEventListener('click', () => {
+          item.classList.remove('is-open');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+  });
+
+  // Close all dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown-item')) {
+      dropdownItems.forEach(item => {
+        item.classList.remove('is-open');
+        const toggle = item.querySelector('.dropdown-toggle');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
+  // Close all dropdowns on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      dropdownItems.forEach(item => {
+        item.classList.remove('is-open');
+        const toggle = item.querySelector('.dropdown-toggle');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+}
+
+// 7. Mobile Sidebar Drawer & Accordion Controls
 const mobileSidebar = document.getElementById('mobile-sidebar-menu');
 const navOverlay = document.getElementById('nav-overlay');
 const menuToggleBtn = document.getElementById('menu-toggle-btn');
@@ -414,6 +538,28 @@ function closeMobileMenu() {
 
 window.openMobileMenu = openMobileMenu;
 window.closeMobileMenu = closeMobileMenu;
+
+window.toggleMobileDropdown = function(headerEl) {
+  const parentDropdown = headerEl.closest('.mobile-dropdown');
+  if (!parentDropdown) return;
+
+  const isOpen = parentDropdown.classList.contains('open');
+
+  // Close other open accordions for crisp single-accordion experience
+  document.querySelectorAll('.mobile-dropdown').forEach(d => {
+    if (d !== parentDropdown) d.classList.remove('open');
+  });
+
+  if (isOpen) {
+    parentDropdown.classList.remove('open');
+  } else {
+    parentDropdown.classList.add('open');
+  }
+
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+};
 
 if (menuToggleBtn) {
   menuToggleBtn.addEventListener('click', openMobileMenu);

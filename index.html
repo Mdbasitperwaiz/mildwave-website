@@ -136,16 +136,356 @@
         <!-- Desktop Navigation links -->
         <nav aria-label="Main Navigation">
           <ul class="nav-links" id="desktop-menu">
-            <li><a href="#home" class="active">Home</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#ro-amc-plans">AMC Plans</a></li>
-            <li><a href="#manpower-charges">Manpower Rates</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#documents">Documents</a></li>
-            <li><a href="flyer.html" target="_blank" rel="noopener noreferrer" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
-            <li><a href="#careers">Careers</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <!-- 1. Home -->
+            <li class="nav-item">
+              <a href="#home" class="nav-link active">Home</a>
+            </li>
+
+            <!-- 2. Services Dropdown (Mega Menu) -->
+            <li class="nav-item dropdown-item mega-dropdown-item" data-dropdown="services">
+              <a href="#services" class="nav-link dropdown-toggle" role="button" aria-expanded="false" aria-haspopup="true">
+                Services <i data-lucide="chevron-down" class="nav-chevron"></i>
+              </a>
+              <div class="dropdown-menu mega-menu" role="menu">
+                <div class="mega-menu-inner">
+                  <div class="mega-menu-grid">
+                    <div class="mega-menu-col">
+                      <span class="mega-col-title">Enterprise &amp; Technical</span>
+                      <a href="#service-it" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="laptop"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>Marketing &amp; IT Services</strong>
+                          <span>Software, Web, Branding &amp; Tech Infra</span>
+                        </div>
+                      </a>
+                      <a href="#service-ro" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="droplet"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>RO Services &amp; AMC</strong>
+                          <span>Commercial RO, Installation &amp; AMC</span>
+                        </div>
+                      </a>
+                      <a href="#service-civil" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="construction"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>Civil &amp; Infra Services</strong>
+                          <span>Commercial &amp; Industrial Infrastructure</span>
+                        </div>
+                      </a>
+                      <a href="#service-manpower" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="users"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>Housekeeping &amp; Manpower</strong>
+                          <span>Facility Staffing &amp; Workforce Deployment</span>
+                        </div>
+                      </a>
+                    </div>
+
+                    <div class="mega-menu-col">
+                      <span class="mega-col-title">Facility &amp; Sanitation</span>
+                      <a href="#service-supply" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="truck"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>General Supply Services</strong>
+                          <span>Institutional Procurement &amp; Supplies</span>
+                        </div>
+                      </a>
+                      <a href="#service-pest" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="bug"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>Pest Control Services</strong>
+                          <span>Termite, Rodent &amp; Commercial Treatment</span>
+                        </div>
+                      </a>
+                      <a href="#service-tank" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="droplets"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>Water Tank Cleaning</strong>
+                          <span>UV Sterilization &amp; Jet Sanitization</span>
+                        </div>
+                      </a>
+                      <a href="#service-pipeline" class="dropdown-sub-link" role="menuitem">
+                        <div class="dropdown-icon-box"><i data-lucide="wrench"></i></div>
+                        <div class="dropdown-link-text">
+                          <strong>Pipeline Cleaning</strong>
+                          <span>Hydro-Jetting &amp; Blockage Clearance</span>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="dropdown-footer">
+                    <a href="#services" class="dropdown-view-all">
+                      <span>View All Services</span>
+                      <i data-lucide="arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 3. AMC Plans Dropdown -->
+            <li class="nav-item dropdown-item" data-dropdown="amc">
+              <a href="#ro-amc-plans" class="nav-link dropdown-toggle" role="button" aria-expanded="false" aria-haspopup="true">
+                AMC Plans <i data-lucide="chevron-down" class="nav-chevron"></i>
+              </a>
+              <div class="dropdown-menu standard-dropdown" role="menu">
+                <div class="dropdown-menu-inner">
+                  <a href="#amc-basic" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="shield"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Basic Plan <span class="dropdown-badge">₹899/yr</span></strong>
+                      <span>Non-Branded RO • 1 Yr Service &amp; TDS Check</span>
+                    </div>
+                  </a>
+                  <a href="#amc-classic" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="award"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Classic Plan <span class="dropdown-badge orange">₹1,499/yr</span></strong>
+                      <span>Non-Branded RO • 3 Free Service Visits</span>
+                    </div>
+                  </a>
+                  <a href="#amc-green" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="check-circle-2"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Green Plan <span class="dropdown-badge green">₹2,399/yr</span></strong>
+                      <span>Non-Branded RO • All Filters Replaced</span>
+                    </div>
+                  </a>
+                  <a href="#amc-green-plus" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="sparkles"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Green Plus Plan <span class="dropdown-badge blue">₹4,599/yr</span></strong>
+                      <span>Kent, Aquaguard, Pureit, Livpure &amp; Major Brands</span>
+                    </div>
+                  </a>
+                  <div class="dropdown-footer">
+                    <a href="#ro-amc-plans" class="dropdown-view-all">
+                      <span>View All AMC Plans</span>
+                      <i data-lucide="arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 4. Manpower Rates Dropdown -->
+            <li class="nav-item dropdown-item" data-dropdown="manpower">
+              <a href="#manpower-charges" class="nav-link dropdown-toggle" role="button" aria-expanded="false" aria-haspopup="true">
+                Manpower Rates <i data-lucide="chevron-down" class="nav-chevron"></i>
+              </a>
+              <div class="dropdown-menu standard-dropdown" role="menu">
+                <div class="dropdown-menu-inner">
+                  <a href="#manpower-charges" onclick="switchManpowerTab('housekeeping')" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="brush"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Housekeeping &amp; Care</strong>
+                      <span>Sweeper, Cleaner, Mali &amp; Gate Keeper</span>
+                    </div>
+                  </a>
+                  <a href="#manpower-charges" onclick="switchManpowerTab('security')" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="shield-check"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Security Services</strong>
+                      <span>Security Guards &amp; Security Supervisors</span>
+                    </div>
+                  </a>
+                  <a href="#manpower-charges" onclick="switchManpowerTab('technical')" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="wrench"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Technical &amp; MEP</strong>
+                      <span>Electrician, Plumber, Pump &amp; Lift Operators</span>
+                    </div>
+                  </a>
+                  <a href="#manpower-charges" onclick="switchManpowerTab('management')" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="user-cog"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Management &amp; Admin</strong>
+                      <span>Facility Supervisors &amp; Facility Managers</span>
+                    </div>
+                  </a>
+                  <div class="dropdown-footer">
+                    <a href="#manpower-charges" class="dropdown-view-all">
+                      <span>View All Manpower Rates</span>
+                      <i data-lucide="arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 5. Projects Dropdown -->
+            <li class="nav-item dropdown-item" data-dropdown="projects">
+              <a href="#projects" class="nav-link dropdown-toggle" role="button" aria-expanded="false" aria-haspopup="true">
+                Projects <i data-lucide="chevron-down" class="nav-chevron"></i>
+              </a>
+              <div class="dropdown-menu standard-dropdown" role="menu">
+                <div class="dropdown-menu-inner">
+                  <a href="#project-ict-instructor" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="graduation-cap"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>ICT Lab Instructor – Phase 2 <span class="dropdown-badge orange">Hiring</span></strong>
+                      <span>Kendriya Bhandar Project (Bihar)</span>
+                    </div>
+                  </a>
+                  <a href="#project-ro-water" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="droplet"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Govt RO Water Supply Project</strong>
+                      <span>Public Sector RO Installations (Bihar)</span>
+                    </div>
+                  </a>
+                  <a href="#project-bihar-manpower" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="users"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Bihar Govt Manpower Services</strong>
+                      <span>Skilled &amp; Non-Skilled Workforce Support</span>
+                    </div>
+                  </a>
+                  <a href="#project-govt-supply" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="truck"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Govt Supply Chain Services</strong>
+                      <span>Institutional Procurement &amp; Supplies</span>
+                    </div>
+                  </a>
+                  <a href="#project-digital-solutions" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="cpu"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Digital &amp; Marketing Solutions</strong>
+                      <span>IT Deployments, Branding &amp; Web Services</span>
+                    </div>
+                  </a>
+                  <div class="dropdown-footer">
+                    <a href="#projects" class="dropdown-view-all">
+                      <span>View All Projects</span>
+                      <i data-lucide="arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 6. About Us Dropdown -->
+            <li class="nav-item dropdown-item" data-dropdown="about">
+              <a href="#about" class="nav-link dropdown-toggle" role="button" aria-expanded="false" aria-haspopup="true">
+                About Us <i data-lucide="chevron-down" class="nav-chevron"></i>
+              </a>
+              <div class="dropdown-menu standard-dropdown" role="menu">
+                <div class="dropdown-menu-inner">
+                  <a href="#about" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="building-2"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Company Profile</strong>
+                      <span>Serving Government &amp; Corporate Sectors</span>
+                    </div>
+                  </a>
+                  <a href="#about-why-choose" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="check-circle-2"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Why Choose Us</strong>
+                      <span>8+ Years Experience, 800+ Projects &amp; Pan India</span>
+                    </div>
+                  </a>
+                  <a href="#process-section" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="workflow"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Working Process</strong>
+                      <span>4-Step Transparent Consultation &amp; Execution</span>
+                    </div>
+                  </a>
+                  <a href="#clients-partners" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="handshake"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Clients &amp; Partners</strong>
+                      <span>L&amp;T, Kendriya Bhandar, RailTel, TCLI</span>
+                    </div>
+                  </a>
+                  <div class="dropdown-footer">
+                    <a href="#about" class="dropdown-view-all">
+                      <span>View About Us</span>
+                      <i data-lucide="arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 7. Documents Dropdown -->
+            <li class="nav-item dropdown-item" data-dropdown="documents">
+              <a href="#documents" class="nav-link dropdown-toggle" role="button" aria-expanded="false" aria-haspopup="true">
+                Documents <i data-lucide="chevron-down" class="nav-chevron"></i>
+              </a>
+              <div class="dropdown-menu standard-dropdown" role="menu">
+                <div class="dropdown-menu-inner">
+                  <a href="#doc-profile" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="file-text"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Company Profile PDF <span class="dropdown-badge">3.2 MB</span></strong>
+                      <span>Management Board &amp; Logistics Framework</span>
+                    </div>
+                  </a>
+                  <a href="#doc-registration" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="shield"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Registration Certificate <span class="dropdown-badge">1.1 MB</span></strong>
+                      <span>MCA Incorporation &amp; Statutory Charter</span>
+                    </div>
+                  </a>
+                  <a href="#doc-gst" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="receipt"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>GST Certificate <span class="dropdown-badge">950 KB</span></strong>
+                      <span>State-Wise GSTIN Registration Clearances</span>
+                    </div>
+                  </a>
+                  <a href="#doc-brochure" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="book-open"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Service Brochure (SLA) <span class="dropdown-badge">4.8 MB</span></strong>
+                      <span>Pricing Guidelines &amp; Escalation Framework</span>
+                    </div>
+                  </a>
+                  <a href="#doc-terms" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="file-check"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Terms &amp; Conditions <span class="dropdown-badge">780 KB</span></strong>
+                      <span>Master MSA &amp; Standard Liability Terms</span>
+                    </div>
+                  </a>
+                  <a href="flyer.html" target="_blank" rel="noopener noreferrer" class="dropdown-sub-link" role="menuitem">
+                    <div class="dropdown-icon-box"><i data-lucide="award"></i></div>
+                    <div class="dropdown-link-text">
+                      <strong>Corporate Marketing Flyer <span class="dropdown-badge orange">A4</span></strong>
+                      <span>Print-Ready A4 Rates &amp; Service Flyer</span>
+                    </div>
+                  </a>
+                  <div class="dropdown-footer">
+                    <a href="#documents" class="dropdown-view-all">
+                      <span>View All Documents</span>
+                      <i data-lucide="arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- 8. Corporate Flyer -->
+            <li class="nav-item">
+              <a href="flyer.html" target="_blank" rel="noopener noreferrer" class="nav-link flyer-link" style="color: var(--accent); font-weight: 700;">
+                Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i>
+              </a>
+            </li>
+
+            <!-- 9. Careers -->
+            <li class="nav-item">
+              <a href="#careers" class="nav-link">Careers</a>
+            </li>
+
+            <!-- 10. Contact -->
+            <li class="nav-item">
+              <a href="#contact" class="nav-link">Contact</a>
+            </li>
           </ul>
         </nav>
 
@@ -172,18 +512,128 @@
         <i data-lucide="x"></i>
       </div>
     </div>
-    <ul class="mobile-nav-links">
-      <li><a href="#home" onclick="closeMobileMenu()">Home</a></li>
-      <li><a href="#services" onclick="closeMobileMenu()">Services</a></li>
-      <li><a href="#ro-amc-plans" onclick="closeMobileMenu()">AMC Plans</a></li>
-      <li><a href="#manpower-charges" onclick="closeMobileMenu()">Manpower Rates</a></li>
-      <li><a href="#projects" onclick="closeMobileMenu()">Projects</a></li>
-      <li><a href="#about" onclick="closeMobileMenu()">About Us</a></li>
-      <li><a href="#documents" onclick="closeMobileMenu()">Documents</a></li>
-      <li><a href="flyer.html" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()" style="color: var(--accent); font-weight: 700;">Corporate Flyer <i data-lucide="external-link" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-left:2px;"></i></a></li>
-      <li><a href="#careers" onclick="closeMobileMenu()">Careers</a></li>
-      <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
-    </ul>
+    <div class="mobile-nav-scroll-wrap">
+      <ul class="mobile-nav-links">
+        <!-- 1. Home -->
+        <li class="mobile-nav-item">
+          <a href="#home" class="mobile-nav-link" onclick="closeMobileMenu()">Home</a>
+        </li>
+
+        <!-- 2. Services Accordion -->
+        <li class="mobile-nav-item mobile-dropdown" data-mobile-dropdown="services">
+          <div class="mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+            <span class="mobile-dropdown-title">Services</span>
+            <i data-lucide="chevron-down" class="mobile-chevron"></i>
+          </div>
+          <div class="mobile-dropdown-menu">
+            <a href="#service-it" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="laptop"></i> Marketing &amp; IT Services</a>
+            <a href="#service-ro" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="droplet"></i> RO Services &amp; AMC</a>
+            <a href="#service-civil" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="construction"></i> Civil &amp; Infra Services</a>
+            <a href="#service-manpower" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="users"></i> Housekeeping &amp; Manpower</a>
+            <a href="#service-supply" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="truck"></i> General Supply Services</a>
+            <a href="#service-pest" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="bug"></i> Pest Control Services</a>
+            <a href="#service-tank" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="droplets"></i> Water Tank Cleaning</a>
+            <a href="#service-pipeline" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="wrench"></i> Pipeline Cleaning &amp; Unclogging</a>
+            <a href="#services" onclick="closeMobileMenu()" class="mobile-view-all-link">View All Services →</a>
+          </div>
+        </li>
+
+        <!-- 3. AMC Plans Accordion -->
+        <li class="mobile-nav-item mobile-dropdown" data-mobile-dropdown="amc">
+          <div class="mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+            <span class="mobile-dropdown-title">AMC Plans</span>
+            <i data-lucide="chevron-down" class="mobile-chevron"></i>
+          </div>
+          <div class="mobile-dropdown-menu">
+            <a href="#amc-basic" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="shield"></i> Basic Plan (₹899/yr)</a>
+            <a href="#amc-classic" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="award"></i> Classic Plan (₹1,499/yr)</a>
+            <a href="#amc-green" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="check-circle-2"></i> Green Plan (₹2,399/yr)</a>
+            <a href="#amc-green-plus" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="sparkles"></i> Green Plus Plan (₹4,599/yr)</a>
+            <a href="#ro-amc-plans" onclick="closeMobileMenu()" class="mobile-view-all-link">View All AMC Plans →</a>
+          </div>
+        </li>
+
+        <!-- 4. Manpower Rates Accordion -->
+        <li class="mobile-nav-item mobile-dropdown" data-mobile-dropdown="manpower">
+          <div class="mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+            <span class="mobile-dropdown-title">Manpower Rates</span>
+            <i data-lucide="chevron-down" class="mobile-chevron"></i>
+          </div>
+          <div class="mobile-dropdown-menu">
+            <a href="#manpower-charges" onclick="switchManpowerTab('housekeeping'); closeMobileMenu();" class="mobile-sub-link"><i data-lucide="brush"></i> Housekeeping &amp; Care</a>
+            <a href="#manpower-charges" onclick="switchManpowerTab('security'); closeMobileMenu();" class="mobile-sub-link"><i data-lucide="shield-check"></i> Security Services</a>
+            <a href="#manpower-charges" onclick="switchManpowerTab('technical'); closeMobileMenu();" class="mobile-sub-link"><i data-lucide="wrench"></i> Technical &amp; MEP</a>
+            <a href="#manpower-charges" onclick="switchManpowerTab('management'); closeMobileMenu();" class="mobile-sub-link"><i data-lucide="user-cog"></i> Management &amp; Admin</a>
+            <a href="#manpower-charges" onclick="closeMobileMenu()" class="mobile-view-all-link">View All Manpower Rates →</a>
+          </div>
+        </li>
+
+        <!-- 5. Projects Accordion -->
+        <li class="mobile-nav-item mobile-dropdown" data-mobile-dropdown="projects">
+          <div class="mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+            <span class="mobile-dropdown-title">Projects</span>
+            <i data-lucide="chevron-down" class="mobile-chevron"></i>
+          </div>
+          <div class="mobile-dropdown-menu">
+            <a href="#project-ict-instructor" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="graduation-cap"></i> ICT Lab Instructor – Phase 2</a>
+            <a href="#project-ro-water" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="droplet"></i> Govt RO Water Supply Project</a>
+            <a href="#project-bihar-manpower" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="users"></i> Bihar Govt Manpower Services</a>
+            <a href="#project-govt-supply" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="truck"></i> Govt Supply Chain Services</a>
+            <a href="#project-digital-solutions" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="cpu"></i> Digital &amp; Marketing Solutions</a>
+            <a href="#projects" onclick="closeMobileMenu()" class="mobile-view-all-link">View All Projects →</a>
+          </div>
+        </li>
+
+        <!-- 6. About Us Accordion -->
+        <li class="mobile-nav-item mobile-dropdown" data-mobile-dropdown="about">
+          <div class="mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+            <span class="mobile-dropdown-title">About Us</span>
+            <i data-lucide="chevron-down" class="mobile-chevron"></i>
+          </div>
+          <div class="mobile-dropdown-menu">
+            <a href="#about" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="building-2"></i> Company Profile</a>
+            <a href="#about-why-choose" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="check-circle-2"></i> Why Choose Us</a>
+            <a href="#process-section" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="workflow"></i> Working Process</a>
+            <a href="#clients-partners" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="handshake"></i> Clients &amp; Partners</a>
+            <a href="#about" onclick="closeMobileMenu()" class="mobile-view-all-link">View About Us →</a>
+          </div>
+        </li>
+
+        <!-- 7. Documents Accordion -->
+        <li class="mobile-nav-item mobile-dropdown" data-mobile-dropdown="documents">
+          <div class="mobile-dropdown-header" onclick="toggleMobileDropdown(this)">
+            <span class="mobile-dropdown-title">Documents</span>
+            <i data-lucide="chevron-down" class="mobile-chevron"></i>
+          </div>
+          <div class="mobile-dropdown-menu">
+            <a href="#doc-profile" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="file-text"></i> Company Profile PDF</a>
+            <a href="#doc-registration" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="shield"></i> Registration Certificate</a>
+            <a href="#doc-gst" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="receipt"></i> GST Certificate</a>
+            <a href="#doc-brochure" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="book-open"></i> Service Brochure (SLA)</a>
+            <a href="#doc-terms" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="file-check"></i> Terms &amp; Conditions</a>
+            <a href="flyer.html" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()" class="mobile-sub-link"><i data-lucide="award"></i> Corporate Marketing Flyer</a>
+            <a href="#documents" onclick="closeMobileMenu()" class="mobile-view-all-link">View All Documents →</a>
+          </div>
+        </li>
+
+        <!-- 8. Corporate Flyer -->
+        <li class="mobile-nav-item">
+          <a href="flyer.html" target="_blank" rel="noopener noreferrer" class="mobile-nav-link" onclick="closeMobileMenu()" style="color: var(--accent); font-weight: 700;">
+            Corporate Flyer <i data-lucide="external-link" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-left:2px;"></i>
+          </a>
+        </li>
+
+        <!-- 9. Careers -->
+        <li class="mobile-nav-item">
+          <a href="#careers" class="mobile-nav-link" onclick="closeMobileMenu()">Careers</a>
+        </li>
+
+        <!-- 10. Contact -->
+        <li class="mobile-nav-item">
+          <a href="#contact" class="mobile-nav-link" onclick="closeMobileMenu()">Contact</a>
+        </li>
+      </ul>
+    </div>
     <div class="mobile-nav-cta">
       <button class="btn btn-primary btn-block" style="width: 100%;" onclick="closeMobileMenu(); toggleQuoteModal(true)">Get Free Quote</button>
     </div>
@@ -391,7 +841,7 @@
           </article>
 
           <!-- Poster 4: Pipeline Cleaning & Unclogging -->
-          <article class="service-poster-card glass-card reveal">
+          <article class="service-poster-card glass-card reveal" id="service-pipeline">
             <div class="poster-badge badge-orange"><i data-lucide="zap"></i> Hydro-Jetting Power</div>
             <div class="poster-header">
               <div class="poster-icon-box orange"><i data-lucide="wrench"></i></div>
@@ -454,7 +904,7 @@
         
         <div class="services-grid">
           <!-- Service 1: Marketing & IT Services -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-it">
             <div class="service-card-icon">
               <i data-lucide="laptop"></i>
             </div>
@@ -466,7 +916,7 @@
           </article>
 
           <!-- Service 2: RO Services & AMC -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-ro">
             <div class="service-card-icon orange-accent">
               <i data-lucide="droplet"></i>
             </div>
@@ -479,7 +929,7 @@
           </article>
 
           <!-- Service 3: Civil & Infra Services -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-civil">
             <div class="service-card-icon">
               <i data-lucide="construction"></i>
             </div>
@@ -491,7 +941,7 @@
           </article>
 
           <!-- Service 4: Housekeeping & Manpower -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-manpower">
             <div class="service-card-icon orange-accent">
               <i data-lucide="users"></i>
             </div>
@@ -504,7 +954,7 @@
           </article>
 
           <!-- Service 5: General Supply Services -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-supply">
             <div class="service-card-icon">
               <i data-lucide="truck"></i>
             </div>
@@ -516,7 +966,7 @@
           </article>
 
           <!-- Service 6: Pest Control Services -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-pest">
             <div class="service-card-icon orange-accent">
               <i data-lucide="bug"></i>
             </div>
@@ -529,7 +979,7 @@
           </article>
 
           <!-- Service 7: Water Tank Cleaning Services -->
-          <article class="service-card glass-card reveal">
+          <article class="service-card glass-card reveal" id="service-tank">
             <div class="service-card-icon">
               <i data-lucide="droplet"></i>
             </div>
@@ -553,7 +1003,7 @@
         </div>
 
         <!-- ICT Lab Instructor Hiring Announcement Banner -->
-        <div class="recruitment-announcement-banner reveal" style="margin-bottom: 40px;">
+        <div class="recruitment-announcement-banner reveal" id="project-ict-instructor" style="margin-bottom: 40px;">
           <div class="banner-text-content">
             <div class="banner-icon"><i data-lucide="megaphone"></i></div>
             <div class="banner-titles">
@@ -580,7 +1030,7 @@
         <!-- Projects Grid -->
         <div class="projects-grid" id="projects-board" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
           <!-- Project 1 -->
-          <article class="project-card glass-card reveal" data-category="ro" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="project-card glass-card reveal" id="project-ro-water" data-category="ro" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="project-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <span class="project-tag" style="background: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full);">RO Purification</span>
@@ -608,7 +1058,7 @@
           </article>
 
           <!-- Project 2 -->
-          <article class="project-card glass-card reveal" data-category="manpower" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="project-card glass-card reveal" id="project-bihar-manpower" data-category="manpower" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="project-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <span class="project-tag" style="background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full);">Manpower &amp; Staff</span>
@@ -636,7 +1086,7 @@
           </article>
 
           <!-- Ongoing Project: Kendriya Bhandar ICT Lab Instructor -->
-          <article class="project-card glass-card reveal" data-category="manpower" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="project-card glass-card reveal" id="project-kb-ict" data-category="manpower" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="project-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <span class="project-tag" style="background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full);">Manpower &amp; Staff</span>
@@ -670,7 +1120,7 @@
           </article>
 
           <!-- Project 3 -->
-          <article class="project-card glass-card reveal" data-category="supply" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="project-card glass-card reveal" id="project-govt-supply" data-category="supply" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="project-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <span class="project-tag" style="background: var(--accent-light); color: var(--accent); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full);">General Supplies</span>
@@ -698,7 +1148,7 @@
           </article>
 
           <!-- Project 4 -->
-          <article class="project-card glass-card reveal" data-category="it" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="project-card glass-card reveal" id="project-digital-solutions" data-category="it" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="project-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <span class="project-tag" style="background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full);">IT &amp; Marketing</span>
@@ -786,7 +1236,7 @@
               Mildwave provides complete business support and technical service solutions across India with expertise in RO Services, AMC Solutions, IT Services, Infrastructure Support, Housekeeping, Manpower Services, and General Supply Operations. We actively serve government institutions and major organizations with reliable and efficient solutions.
             </p>
             
-            <h3 class="about-subtitle">Why Choose Us</h3>
+            <h3 class="about-subtitle" id="about-why-choose">Why Choose Us</h3>
             <div class="why-choose-grid">
               <div class="why-item"><i data-lucide="check-circle-2"></i> Expert Team</div>
               <div class="why-item"><i data-lucide="check-circle-2"></i> Quick Response</div>
@@ -818,7 +1268,7 @@
               </div>
             </div>
             <div class="trusted-badge reveal" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(249, 115, 22, 0.08); color: var(--accent); border: 1px dashed rgba(249, 115, 22, 0.25); padding: 8px 20px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600; margin-top: 10px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.03);">
-              <i data-lucide="shield-check" style="width: 16px; height: 16px; stroke-width: 2.5;"></i> Trusted by Government & Corporate Sectors
+              <i data-lucide="shield-check" style="width: 16px; height: 16px; stroke-width: 2.5;"></i> Trusted by Government &amp; Corporate Sectors
             </div>
           </div>
 
@@ -827,7 +1277,7 @@
     </section>
 
     <!-- PROCESS SECTION -->
-    <section class="section-padding">
+    <section class="section-padding" id="process-section">
       <div class="container">
         <div class="section-header reveal">
           <h2>Our Structured Working Process</h2>
@@ -888,7 +1338,7 @@
         
         <div class="amc-plans-grid" style="margin-bottom: 40px;">
           <!-- Card 1: Basic Plan -->
-          <div class="amc-plan-card glass-card reveal basic-plan">
+          <div class="amc-plan-card glass-card reveal basic-plan" id="amc-basic">
              <div class="amc-plan-header">
               <span class="amc-brand-badge brand-nonbranded" style="color: #475569; background: #f1f5f9;">Non-Branded RO Only</span>
               <h3>Basic Plan</h3>
@@ -910,7 +1360,7 @@
           </div>
 
           <!-- Card 2: Classic Plan -->
-          <div class="amc-plan-card glass-card reveal offer-plan highlighted">
+          <div class="amc-plan-card glass-card reveal offer-plan highlighted" id="amc-classic">
             <div class="amc-plan-badge badge-orange">Best Value</div>
             <div class="amc-plan-header">
               <span class="amc-brand-badge brand-nonbranded" style="color: #475569; background: #f1f5f9;">Non-Branded RO Only</span>
@@ -933,7 +1383,7 @@
             </div>
           </div>
           <!-- Card 3: Green Plan -->
-          <div class="amc-plan-card glass-card reveal green-plan">
+          <div class="amc-plan-card glass-card reveal green-plan" id="amc-green">
             <div class="amc-plan-badge badge-green">Smart Choice</div>
             <div class="amc-plan-header">
               <span class="amc-brand-badge brand-nonbranded" style="color: #475569; background: #f1f5f9;">Non-Branded RO Only</span>
@@ -957,7 +1407,7 @@
           </div>
 
           <!-- Card 4: Green Plus Plan -->
-          <div class="amc-plan-card glass-card reveal green-plus-plan highlighted-blue">
+          <div class="amc-plan-card glass-card reveal green-plus-plan highlighted-blue" id="amc-green-plus">
             <div class="amc-plan-badge badge-teal">Premium Care</div>
             <div class="amc-plan-header">
               <span class="amc-brand-badge brand-branded" style="color: #0369a1; background: #e0f2fe;">Major Brands</span>
@@ -1585,7 +2035,7 @@
         
         <div class="doc-grid" id="legal-documents-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
           <!-- Doc 1 -->
-          <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="doc-card glass-card reveal" id="doc-profile" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="file-text"></i></div>
@@ -1598,7 +2048,7 @@
           </article>
           
           <!-- Doc 2 -->
-          <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="doc-card glass-card reveal" id="doc-registration" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="shield"></i></div>
@@ -1611,7 +2061,7 @@
           </article>
           
           <!-- Doc 3 -->
-          <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="doc-card glass-card reveal" id="doc-gst" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="receipt"></i></div>
@@ -1624,7 +2074,7 @@
           </article>
           
           <!-- Doc 4 -->
-          <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="doc-card glass-card reveal" id="doc-brochure" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="book-open"></i></div>
@@ -1637,7 +2087,7 @@
           </article>
           
           <!-- Doc 5 -->
-          <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="doc-card glass-card reveal" id="doc-terms" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="file-check"></i></div>
@@ -1650,7 +2100,7 @@
           </article>
 
           <!-- Doc 6 (Corporate Flyer) -->
-          <article class="doc-card glass-card reveal" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <article class="doc-card glass-card reveal" id="doc-flyer" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div>
               <div class="doc-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                 <div class="doc-icon" style="width: 50px; height: 50px; background: #ffebe0; color: var(--accent); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;"><i data-lucide="award"></i></div>
