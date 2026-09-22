@@ -1220,7 +1220,7 @@ header nav {
 /* Services Section */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: 32px;
 }
 
@@ -1679,6 +1679,13 @@ textarea.form-control {
   align-items: flex-start;
 }
 
+/* Mobile nav CTA bottom button styling */
+.mobile-nav-cta {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
 .career-perks-list {
   display: flex;
   flex-direction: column;
@@ -1695,9 +1702,12 @@ textarea.form-control {
   box-shadow: var(--shadow-sm);
 }
 
-.career-perk-card i {
-  font-size: 1.75rem;
+.career-perk-card i,
+.career-perk-card svg {
+  width: 24px;
+  height: 24px;
   color: var(--primary);
+  flex-shrink: 0;
 }
 
 .career-perk-card h4 {
@@ -2501,6 +2511,12 @@ textarea.form-control {
   .glass-about-card {
     padding: 32px !important;
   }
+
+  /* Fix iOS parallax bug on about section background */
+  .about-company-section {
+    background-attachment: scroll !important;
+  }
+
 }
 
 @media (max-width: 480px) {
@@ -2526,7 +2542,7 @@ textarea.form-control {
     gap: 16px;
   }
   .glass-about-card {
-    padding: 24px !important;
+    padding: 20px !important;
   }
   .why-choose-grid {
     grid-template-columns: 1fr !important;
@@ -2544,8 +2560,9 @@ textarea.form-control {
     right: 20px;
   }
   .whatsapp-chat-drawer {
-    right: 20px;
-    width: calc(100vw - 40px);
+    right: 16px;
+    width: calc(100vw - 32px);
+    bottom: 90px;
   }
   .form-card {
     padding: 24px;
@@ -2553,19 +2570,33 @@ textarea.form-control {
   .stat-card {
     padding: 24px 16px !important;
   }
+  .stat-card h3 {
+    font-size: 2.5rem;
+  }
+  /* Fix brand logo — consistent 38px at 480px */
   .brand-name {
-    font-size: 1.55rem !important;
+    font-size: 1.45rem !important;
   }
   .brand-container img {
-    width: 65px !important;
-    height: 65px !important;
+    width: 38px !important;
+    height: 38px !important;
   }
   .mobile-nav .brand-name {
     font-size: 1.45rem !important;
   }
   .mobile-nav .brand-container img {
-    width: 65px !important;
-    height: 65px !important;
+    width: 38px !important;
+    height: 38px !important;
+  }
+  .section-padding {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+  .career-grid {
+    gap: 28px;
+  }
+  .booking-info {
+    padding: 28px !important;
   }
 }
 
@@ -3272,7 +3303,7 @@ main {
 /* Service Posters Layout & Grid */
 .service-posters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: 32px;
   margin-top: 40px;
 }
@@ -3833,5 +3864,148 @@ main {
 }
 
 
+/* ==========================================================================
+   COMPREHENSIVE MOBILE RESPONSIVENESS FIXES — QA PASS 2026-09
+   ========================================================================== */
+
+/* Fix WhatsApp drawer on 576-600px range */
+@media (max-width: 600px) {
+  .whatsapp-chat-drawer {
+    right: 16px;
+    width: calc(100vw - 32px);
+    bottom: 90px;
+  }
+  .floating-widgets {
+    bottom: 16px;
+    right: 16px;
+    gap: 12px;
+  }
+  .float-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+}
+
+/* Career grid — stack on mobile */
+@media (max-width: 768px) {
+  .career-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .manpower-tabs-container {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+}
+
+/* 360px ultra-small screen fixes */
+@media (max-width: 360px) {
+  :root {
+    --navbar-height: 64px;
+  }
+
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .section-padding {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .section-header {
+    margin-bottom: 32px;
+  }
+
+  .brand-name {
+    font-size: 1.25rem !important;
+  }
+
+  .brand-container img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .hero-carousel {
+    height: 420px !important;
+  }
+
+  .slide-content .hero-title {
+    font-size: 1.55rem !important;
+  }
+
+  .slide-content .hero-subheading {
+    font-size: 0.9rem !important;
+    margin-bottom: 20px !important;
+  }
+
+  .hero-actions .btn {
+    padding: 12px 18px;
+    font-size: 0.875rem;
+  }
+
+  .glass-about-card {
+    padding: 16px !important;
+  }
+
+  .booking-info {
+    padding: 20px !important;
+  }
+
+  .form-card {
+    padding: 18px !important;
+  }
+
+  .vacancy-announcement-inner {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .vacancy-announcement-message {
+    font-size: 0.78rem;
+  }
+
+  .vacancy-apply {
+    font-size: 0.72rem;
+    padding: 6px 12px;
+  }
+
+  .mobile-nav {
+    width: 300px;
+    max-width: 90vw;
+    padding: 18px 16px;
+  }
+
+  .amc-plan-card {
+    padding: 24px 16px !important;
+  }
+
+  .stat-card h3 {
+    font-size: 2rem;
+  }
+
+  .whatsapp-chat-drawer {
+    width: calc(100vw - 24px);
+    right: 12px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* Ensure no horizontal scroll at any viewport */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
 
 

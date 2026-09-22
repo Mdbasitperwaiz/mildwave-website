@@ -51,7 +51,7 @@
   </script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="style.min.css?v=22">
+  <link rel="stylesheet" href="style.min.css?v=23">
   
   <!-- Lucide Icons CDN for sleek, modern SVG icons -->
   <script src="https://unpkg.com/lucide@latest" defer></script>
@@ -111,8 +111,8 @@
   <div class="top-bar">
     <div class="container top-bar-content">
       <div class="top-bar-info">
-        <span><i data-lucide="phone"></i> +91 85440 71616</span>
-        <span><i data-lucide="mail"></i> mildwavempatna@gmail.com</span>
+        <span><i data-lucide="phone"></i> <a href="tel:+918544071616" style="color:inherit;">+91 85440 71616</a></span>
+        <span><i data-lucide="mail"></i> <a href="mailto:mildwavempatna@gmail.com" style="color:inherit;">mildwavempatna@gmail.com</a></span>
         <span><i data-lucide="map-pin"></i> Pan India Services</span>
       </div>
       <div class="top-bar-socials">
@@ -2348,11 +2348,11 @@
   </div>
 
   <!-- POPUP MODAL: FREE CONSULTATION / QUOTE FORM -->
-  <div class="quote-modal" id="quote-popup-modal">
+  <div class="quote-modal" id="quote-popup-modal" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
     <div class="quote-modal-card">
       <div class="quote-modal-header">
-        <h3>Request a Free Quote</h3>
-        <div class="quote-modal-close" onclick="toggleQuoteModal(false)">&times;</div>
+        <h3 id="quote-modal-title">Request a Free Quote</h3>
+        <div class="quote-modal-close" onclick="toggleQuoteModal(false)" role="button" aria-label="Close modal" tabindex="0">&times;</div>
       </div>
       <div class="quote-modal-body">
         <div id="modal-form-container">
@@ -2438,6 +2438,6 @@
   </div>
 
   <!-- Javascript Scripts -->
-  <script src="script.min.js?v=37" defer></script>
+  <script src="script.min.js?v=38" defer></script>
 </body>
 </html>
